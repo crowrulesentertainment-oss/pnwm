@@ -40,3 +40,11 @@ For the pnwm_giveback_* tables in that same project, RLS is enabled. Published p
 ## Operating rule
 
 PNWM's website should remain strictly non-monetary: no donation/payment links, fundraising appeals, crowdfunding, cash pledges, paid sponsorship requests, or claims that any contribution is tax-deductible. Resource listings about third-party financial assistance are informational resources for families and are not a solicitation by PNWM.
+
+## Follow-up: single Supabase project
+
+At the operator's direction, the PNWM site now uses only Supabase project `cevylpnoexugwgygvtgu`. The second project URL and key were removed from the homepage. There is one `createClient` call; the legacy request-client variable aliases that same client.
+
+The following previously missing PNWM content/form tables were created in `cevylpnoexugwgygvtgu` with RLS enabled: `mother_resources`, `mother_resource_submissions`, `mother_events`, `mother_programs`, `mother_support_requests`, `mother_meeting_interest`, `mother_volunteers`, and `mother_partners`. Public read policies are limited to verified resources, visible events, and active programs. Public submissions use insert-only grants and policies with validation; there are no public read policies on those submission tables.
+
+Migration record: `supabase/migrations/20261013060000_pnwm_single_supabase_project.sql`. It documents the schema applied directly to project `cevylpnoexugwgygvtgu`. Because the other project's data was not available through the authorized workspace, this change creates the required tables in the approved project but does not migrate rows from the former project. The website's curated regional resources and starter events/programs remain the fallback content until PNWM records are added and verified in the approved project.
