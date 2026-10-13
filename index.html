@@ -784,7 +784,7 @@ section{
 }
 
 /* =========================================================
-   FUNDRAISERS
+   GIVE-BACK PROJECTS
 ========================================================= */
 
 .fundraiser-grid{
@@ -1414,7 +1414,7 @@ footer a:hover{
         <div class="step-number">03 — PARTICIPATE</div>
         <h3>Get involved</h3>
         <p>
-          Volunteer, share skills, organize events, sponsor programs,
+          Volunteer, share skills, organize events,
           or simply spread the word.
         </p>
       </div>
@@ -1423,94 +1423,12 @@ footer a:hover{
         <div class="step-number">04 — GIVE BACK</div>
         <h3>Help another mother</h3>
         <p>
-          As the program grows, community-generated revenue can help
-          fund direct assistance and future programs.
+          As the program grows, community members can share skills,
+          volunteer time, and verified resource information.
         </p>
       </div>
 
     </div>
-
-  </div>
-
-</section>
-
-
-<!-- =======================================================
-     MONEY
-======================================================= -->
-
-<section class="money-section">
-
-  <div class="container">
-
-    <div class="section-head">
-
-      <div class="section-label">Where the money goes</div>
-
-      <h2>Build something that gives back.</h2>
-
-      <p>
-        Pacific Northwest Mother's is connected to CrowRules Entertainment.
-        The goal is to create a sustainable cycle where the larger
-        entertainment organization can help support the community initiative.
-      </p>
-
-    </div>
-
-    <div class="money-grid">
-
-      <div class="money-card highlight">
-
-        <div class="money-icon">♥</div>
-
-        <h3>Back into Pacific Northwest Mother's</h3>
-
-        <p>
-          Funds can support future mother-assistance programs,
-          community events, resource projects, supplies, meetings,
-          outreach and other direct community needs.
-        </p>
-
-        <div class="money-flow">
-
-          <div class="flow-box">Revenue</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-box">Mother's Programs</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-box">Mothers & Families</div>
-
-        </div>
-
-      </div>
-
-      <div class="money-card">
-
-        <div class="money-icon">♣</div>
-
-        <h3>Supporting CrowRules Entertainment</h3>
-
-        <p>
-          Revenue can also help support the technology, production,
-          administration and infrastructure that make the broader
-          CrowRules Entertainment organization possible.
-        </p>
-
-        <p>
-          <strong>
-            The goal is entertainment helping create resources for community.
-          </strong>
-        </p>
-
-      </div>
-
-    </div>
-
-    <p class="legal-note">
-      Financial percentages, tax treatment, charitable-donation status and
-      the final organizational structure should be established with qualified
-      legal and accounting professionals before accepting tax-deductible
-      charitable contributions.
-    </p>
 
   </div>
 
@@ -1934,7 +1852,7 @@ footer a:hover{
           <p>We will contact established family-serving organizations to confirm current needs and partnership interest before announcing collection or delivery arrangements.</p>
           <p><a href="https://www.mcfhc.org/" target="_blank" rel="noopener noreferrer">Multicultural Child &amp; Family Hope Center</a></p>
           <p><a href="https://pregnancyaidwa.org/FindUs.html" target="_blank" rel="noopener noreferrer">Pregnancy Aid of Tacoma</a></p>
-          <p class="form-note">These are independent organizations, not confirmed PNWM partners. Please check their current donation policies directly.</p>
+          <p class="form-note">These are independent organizations, not confirmed PNWM partners. Please check their current item-acceptance policies directly.</p>
         </div>
       </aside>
     </div>
@@ -3191,7 +3109,7 @@ $("#programCategoryFilter").addEventListener("change",applyProgramFilters);
 
 
 /* =========================================================
-   LOAD FUNDRAISERS
+   LOAD GIVE-BACK PROJECT DATA
 ========================================================= */
 
 async function loadGivebackProject(){
@@ -3223,7 +3141,7 @@ async function loadGivebackProject(){
       if(bar) bar.style.width=percent+"%";
       if(label) label.textContent=goal>0?collected.toLocaleString()+" of "+goal.toLocaleString()+" items ("+percent+"%)":"Target to be announced";
       if(progress) progress.setAttribute("aria-valuenow",String(percent));
-      if(note) note.textContent=project.last_verified_at?"Counts last verified "+new Date(project.last_verified_at).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})+". Totals reflect logged supplies, not monetary donations.":"Counts are based on project records; verification date has not been published yet.";
+      if(note) note.textContent=project.last_verified_at?"Counts last verified "+new Date(project.last_verified_at).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})+". Totals reflect logged physical supplies only.":"Counts are based on project records; verification date has not been published yet.";
     }
     const updatesQuery=client.from("pnwm_giveback_updates").select("title,body,published_at").eq("project_slug","mother-baby-essentials").eq("status","published").order("published_at",{ascending:false}).limit(4);
     const updateResult=await withTimeout(updatesQuery);
