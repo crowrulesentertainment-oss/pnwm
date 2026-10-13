@@ -2466,93 +2466,113 @@ $("#year").textContent =
 
 async function loadResources(){
 
-  const grid =
-    $("#resourceGrid");
+  const grid = $("#resourceGrid");
+  const curatedResources = [
+    {
+      category:"Immediate support",
+      name:"Washington 211",
+      description:"Find local food, housing, utility assistance, health services, childcare and other community programs. Search online or call 2-1-1.",
+      website:"https://wa211.org/",
+      phone:"Call 2-1-1"
+    },
+    {
+      category:"Crisis support",
+      name:"988 Suicide & Crisis Lifeline",
+      description:"Free, confidential support for people experiencing emotional distress or a mental health crisis, 24/7.",
+      website:"https://988lifeline.org/",
+      phone:"Call or text 988"
+    },
+    {
+      category:"Food & nutrition",
+      name:"Washington WIC",
+      description:"Nutrition education and food benefits for eligible pregnant and postpartum people, infants and children under five.",
+      website:"https://doh.wa.gov/you-and-your-family/wic",
+      phone:""
+    },
+    {
+      category:"Family benefits",
+      name:"Washington DSHS — TANF",
+      description:"Learn about cash assistance and related services for eligible families with children.",
+      website:"https://www.dshs.wa.gov/esa/community-services-offices/temporary-assistance-needy-families",
+      phone:""
+    },
+    {
+      category:"Childcare",
+      name:"Child Care Aware of Washington",
+      description:"Get help finding childcare and information about resources for families and providers.",
+      website:"https://childcareawarewa.org/",
+      phone:""
+    },
+    {
+      category:"Housing",
+      name:"Washington State Housing Resources",
+      description:"Start with the state resource directory for housing assistance, homelessness services and related support.",
+      website:"https://www.commerce.wa.gov/",
+      phone:"For local referrals, call 2-1-1"
+    },
+    {
+      category:"Safety & advocacy",
+      name:"Washington State Coalition Against Domestic Violence",
+      description:"Find information and pathways to local domestic violence advocacy and safety-planning services. If you are in immediate danger, call 911.",
+      website:"https://wscadv.org/",
+      phone:""
+    },
+    {
+      category:"Pregnancy & postpartum",
+      name:"Postpartum Support International",
+      description:"Information and support for pregnancy- and postpartum-related emotional wellbeing, including ways to connect with trained support.",
+      website:"https://postpartum.net/",
+      phone:"Call or text 1-800-944-4773"
+    },
+    {
+      category:"Parenting & family",
+      name:"ParentHelp123",
+      description:"Washington-focused information to help families connect with food, health coverage and other services for children and parents.",
+      website:"https://www.parenthelp123.org/",
+      phone:""
+    }
+  ];
 
-  const { data,error } =
-    await supabaseClient
+  function renderResource(resource){
+    const safeWebsite = /^https:\/\//i.test(String(resource.website || "")) ? String(resource.website) : "";
+    return `
+      <article class="resource">
+        <span class="resource-tag">${escapeHTML(resource.category || "Community resource")}</span>
+        <h3>${escapeHTML(resource.name || "Resource")}</h3>
+        <p>${escapeHTML(resource.description || "")}</p>
+        ${safeWebsite ? `<a href="${escapeHTML(safeWebsite)}" target="_blank" rel="noopener noreferrer">Visit resource ↗</a>` : ""}
+        ${resource.phone ? `<p style="margin-top:10px"><strong>${escapeHTML(resource.phone)}</strong></p>` : ""}
+      </article>`;
+  }
+
+  // Render useful public resources immediately; the page remains useful even
+  // when the community database is empty or temporarily unreachable.
+  grid.innerHTML = curatedResources.map(renderResource).join("");
+
+  try {
+    const { data, error } = await supabaseClient
       .from("mother_resources")
       .select("*")
-      .eq("verified",true)
-      .order("created_at",{ascending:false});
+      .eq("verified", true)
+      .order("created_at", { ascending: false });
 
-  if(error){
+    if(error){
+      console.warn("Community resource loading issue:", error.message);
+      return;
+    }
 
-    console.error(
-      "Resource loading error:",
-      error
-    );
-
-    grid.innerHTML = `
-      <div class="loading">
-        Resources are temporarily unavailable.
-      </div>
-    `;
-
-    return;
+    if(data && data.length){
+      const curatedNames = new Set(curatedResources.map(r => r.name.toLowerCase()));
+      const communityResources = data.filter(r =>
+        r.name && !curatedNames.has(String(r.name).toLowerCase())
+      );
+      if(communityResources.length){
+        grid.innerHTML += communityResources.map(renderResource).join("");
+      }
+    }
+  } catch(error) {
+    console.warn("Community resources could not be refreshed:", error);
   }
-
-  if(!data || data.length === 0){
-
-    grid.innerHTML = `
-      <div class="loading">
-        Community resources are being built.
-        Check back soon.
-      </div>
-    `;
-
-    return;
-  }
-
-  grid.innerHTML =
-    data.map(resource => `
-
-      <article class="resource">
-
-        <span class="resource-tag">
-          ${escapeHTML(resource.category)}
-        </span>
-
-        <h3>
-          ${escapeHTML(resource.name)}
-        </h3>
-
-        <p>
-          ${escapeHTML(resource.description || "")}
-        </p>
-
-        ${
-          resource.website
-          ?
-          `
-          <a
-            href="${escapeHTML(resource.website)}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Visit resource →
-          </a>
-          `
-          :
-          ""
-        }
-
-        ${
-          resource.phone
-          ?
-          `
-          <p style="margin-top:10px">
-            ${escapeHTML(resource.phone)}
-          </p>
-          `
-          :
-          ""
-        }
-
-      </article>
-
-    `).join("");
-
 }
 
 
