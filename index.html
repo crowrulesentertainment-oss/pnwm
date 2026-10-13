@@ -2549,26 +2549,16 @@ footer a:hover{
    SUPABASE CONFIGURATION
 ========================================================= */
 
-const SUPABASE_URL =
-  "https://zauxdqyssratvzmomozf.supabase.co";
-
-const SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_-Z6wecSOxwOk6IBut2zLnw_8DfRxnE9";
-
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-  );
-
-/* Dedicated connection for PNWM registration and application submissions.
-   Keep the existing PNWM content connection above unchanged. */
-const REQUESTS_SUPABASE_URL = "https://cevylpnoexugwgygvtgu.supabase.co";
-const REQUESTS_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_AdfM5y6RqvF3tbvEVzDZSg_JuGTQLD-";
-const requestsSupabaseClient = window.supabase.createClient(
-  REQUESTS_SUPABASE_URL,
-  REQUESTS_SUPABASE_PUBLISHABLE_KEY
+// PNWM uses one Supabase project for content and form submissions.
+const SUPABASE_URL = "https://cevylpnoexugwgygvtgu.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_AdfM5y6RqvF3tbvEVzDZSg_JuGTQLD-";
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
 );
+
+// Backward-compatible alias: this is the same client, not a second connection.
+const requestsSupabaseClient = supabaseClient;
 
 
 /* =========================================================
