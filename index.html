@@ -3195,9 +3195,12 @@ async function loadFundraisers(){
 
   try{
     const client = requestsSupabaseClient || supabaseClient;
-    const timeout = new Promise((_,reject)=>setTimeout(()=>reject(new Error("Give-back data request timed out")),6500));
+    const withTimeout = promise => Promise.race([
+      promise,
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error("Give-back data request timed out")),6500))
+    ]);
     const query = client.from("pnwm_giveback_projects").select("*").eq("slug","mother-baby-essentials").eq("status","published").maybeSingle();
-    const result = await Promise.race([query,timeout]);
+    const result = await withTimeout(query);
     if(result.error) throw result.error;
     const project=result.data;
     if(project){
@@ -3213,7 +3216,7 @@ async function loadFundraisers(){
       if(note) note.textContent=project.last_verified_at?"Counts last verified "+new Date(project.last_verified_at).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})+". Totals reflect logged supplies, not monetary donations.":"Counts are based on project records; verification date has not been published yet.";
     }
     const updatesQuery=client.from("pnwm_giveback_updates").select("title,body,published_at").eq("project_slug","mother-baby-essentials").eq("status","published").order("published_at",{ascending:false}).limit(4);
-    const updateResult=await Promise.race([updatesQuery,timeout]);
+    const updateResult=await withTimeout(updatesQuery);
     if(updateResult.error) throw updateResult.error;
     if(updates && updateResult.data && updateResult.data.length){
       updates.innerHTML=updateResult.data.map(item=>'<article class="giveback-update"><time datetime="'+escapeHTML(item.published_at||"")+'">'+(item.published_at?new Date(item.published_at).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"}):"Project update")+'</time><h4>'+escapeHTML(item.title)+'</h4><p>'+escapeHTML(item.body)+'</p></article>').join("");
