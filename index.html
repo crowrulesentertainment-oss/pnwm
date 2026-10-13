@@ -2923,17 +2923,33 @@ function applyEventFilters(){
 
 async function loadEvents(){
   const grid=$("#eventGrid");
+  if(!grid) return;
+
+  // Render curated, verified-source listings immediately. A slow or unavailable
+  // Supabase request must never leave the events area stuck on "Loading".
+  loadedEvents = getStarterEvents();
+  grid.innerHTML = loadedEvents.map(renderEvent).join("");
+  applyEventFilters();
+
   try{
-    const {data,error}=await supabaseClient.from("mother_events").select("*").in("status",["published","planning"]).order("event_date",{ascending:true});
+    if(!supabaseClient) throw new Error("Supabase client unavailable");
+    const query = supabaseClient
+      .from("mother_events")
+      .select("*")
+      .in("status",["published","planning"])
+      .order("event_date",{ascending:true});
+    const timeout = new Promise((_,reject)=>setTimeout(()=>reject(new Error("Events request timed out")),7000));
+    const {data,error}=await Promise.race([query,timeout]);
     if(error) throw error;
-    loadedEvents=(data || []).filter(event=>event.title);
-    if(!loadedEvents.length){
-      loadedEvents = getStarterEvents();
-    }
+
+    const remoteEvents=(data || []).filter(event=>event.title);
+    // Keep the regional fallback when the table is empty; otherwise prefer
+    // organizer-managed records from Supabase.
+    if(remoteEvents.length) loadedEvents=remoteEvents;
     grid.innerHTML=loadedEvents.map(renderEvent).join("");
     applyEventFilters();
   }catch(error){
-    console.error("Event loading error:",error);
+    console.warn("Using regional event listings because Supabase events could not be loaded:",error);
     loadedEvents = getStarterEvents();
     grid.innerHTML=loadedEvents.map(renderEvent).join("");
     applyEventFilters();
@@ -3009,17 +3025,30 @@ function applyProgramFilters(){
 
 async function loadPrograms(){
   const grid=$("#programGrid");
+  if(!grid) return;
+
+  // Show useful regional programs immediately instead of waiting on the API.
+  loadedPrograms = getStarterPrograms();
+  grid.innerHTML = loadedPrograms.map(renderProgram).join("");
+  applyProgramFilters();
+
   try{
-    const {data,error}=await supabaseClient.from("mother_programs").select("*").eq("active",true).order("created_at",{ascending:false});
+    if(!supabaseClient) throw new Error("Supabase client unavailable");
+    const query = supabaseClient
+      .from("mother_programs")
+      .select("*")
+      .eq("active",true)
+      .order("created_at",{ascending:false});
+    const timeout = new Promise((_,reject)=>setTimeout(()=>reject(new Error("Programs request timed out")),7000));
+    const {data,error}=await Promise.race([query,timeout]);
     if(error) throw error;
-    loadedPrograms=(data || []).filter(program=>program.name);
-    if(!loadedPrograms.length){
-      loadedPrograms = getStarterPrograms();
-    }
+
+    const remotePrograms=(data || []).filter(program=>program.name);
+    if(remotePrograms.length) loadedPrograms=remotePrograms;
     grid.innerHTML=loadedPrograms.map(renderProgram).join("");
     applyProgramFilters();
   }catch(error){
-    console.error("Program loading error:",error);
+    console.warn("Using regional program listings because Supabase programs could not be loaded:",error);
     loadedPrograms = getStarterPrograms();
     grid.innerHTML=loadedPrograms.map(renderProgram).join("");
     applyProgramFilters();
