@@ -1761,7 +1761,7 @@ footer a:hover{
       <h2>Community happens together.</h2>
 
       <p>
-        Upcoming events are loaded directly from Supabase.
+        Events are managed through Supabase. When no events are published yet, proposed gatherings appear here so the community can help shape them. Dates and venues are not confirmed until announced.
       </p>
 
     </div>
@@ -2928,17 +2928,57 @@ async function loadEvents(){
     if(error) throw error;
     loadedEvents=(data || []).filter(event=>event.title);
     if(!loadedEvents.length){
-      grid.innerHTML='<div class="loading">No events have been announced yet. Check back for community meetings, workshops and gatherings.</div>';
-      $("#eventCount").textContent="No announced events yet";
-      return;
+      loadedEvents = getStarterEvents();
     }
     grid.innerHTML=loadedEvents.map(renderEvent).join("");
     applyEventFilters();
   }catch(error){
     console.error("Event loading error:",error);
-    grid.innerHTML='<div class="loading">Events are temporarily unavailable. Please try again later.</div>';
-    $("#eventCount").textContent="Events could not be loaded";
+    loadedEvents = getStarterEvents();
+    grid.innerHTML=loadedEvents.map(renderEvent).join("");
+    applyEventFilters();
   }
+}
+
+function getStarterEvents(){
+  return [
+    {
+      id:"pnwm-interest-listening-circle",
+      title:"Mothers’ Community Listening Circle",
+      description:"A welcoming, low-pressure conversation for mothers and caregivers to share what support, connections and local resources would be most useful. Help shape the future of PNWM.",
+      event_date:null,
+      location:"Pacific Northwest · format to be determined",
+      event_type:"Community connection",
+      status:"planning"
+    },
+    {
+      id:"pnwm-virtual-welcome",
+      title:"PNWM Welcome & Resource Exchange",
+      description:"An introductory gathering to meet the community, exchange resource ideas and identify trusted local organizations. We’re collecting interest before confirming a date and format.",
+      event_date:null,
+      location:"Online or regional meetup · details to be determined",
+      event_type:"Welcome / networking",
+      status:"planning"
+    },
+    {
+      id:"pnwm-family-resource-workshop",
+      title:"Family Resource Navigation Workshop",
+      description:"A proposed practical session about finding family, childcare, food, housing and wellbeing resources across the Pacific Northwest. Share the topics you would like covered.",
+      event_date:null,
+      location:"Pacific Northwest · venue and format to be determined",
+      event_type:"Resource education",
+      status:"planning"
+    },
+    {
+      id:"pnwm-community-partner-roundtable",
+      title:"Community Partner & Volunteer Roundtable",
+      description:"A proposed conversation for community groups, service providers and volunteers interested in collaborating on useful, family-centered support.",
+      event_date:null,
+      location:"Pacific Northwest · details to be determined",
+      event_type:"Partnership / volunteer",
+      status:"planning"
+    }
+  ];
 }
 
 const PROGRAM_CATEGORIES={
@@ -3003,17 +3043,69 @@ async function loadPrograms(){
     if(error) throw error;
     loadedPrograms=(data || []).filter(program=>program.name);
     if(!loadedPrograms.length){
-      grid.innerHTML='<div class="loading">Programs are currently being developed. Check back for new family support and community opportunities.</div>';
-      $("#programCount").textContent="No active programs listed yet";
-      return;
+      loadedPrograms = getStarterPrograms();
     }
     grid.innerHTML=loadedPrograms.map(renderProgram).join("");
     applyProgramFilters();
   }catch(error){
     console.error("Program loading error:",error);
-    grid.innerHTML='<div class="loading">Programs are temporarily unavailable. Please try again later.</div>';
-    $("#programCount").textContent="Programs could not be loaded";
+    loadedPrograms = getStarterPrograms();
+    grid.innerHTML=loadedPrograms.map(renderProgram).join("");
+    applyProgramFilters();
   }
+}
+
+function getStarterPrograms(){
+  return [
+    {
+      id:"pnwm-peer-connection",
+      name:"Peer Connection & Community Circles",
+      category:"community",
+      description:"A proposed peer-connection program where mothers and caregivers can share experiences, build social connections and help guide future community gatherings. Currently collecting interest; sessions are not yet scheduled.",
+      service_area:"Pacific Northwest",
+      status:"Proposed — gathering interest"
+    },
+    {
+      id:"pnwm-family-resource-navigation",
+      name:"Family Resource Navigation",
+      category:"practical",
+      description:"Help shape a practical directory and referral pathway for family needs such as food, housing, childcare, financial assistance and local support services. PNWM does not guarantee eligibility or provide these services directly.",
+      service_area:"Pacific Northwest",
+      status:"Proposed — gathering interest"
+    },
+    {
+      id:"pnwm-maternal-wellbeing",
+      name:"Maternal Wellbeing & Support",
+      category:"wellbeing",
+      description:"A proposed community-led space to identify helpful wellbeing resources and peer support options for mothers. This is not a clinical or crisis service, and no sessions have been scheduled.",
+      service_area:"Pacific Northwest",
+      status:"Proposed — gathering interest"
+    },
+    {
+      id:"pnwm-parent-learning",
+      name:"Parent Learning & Resource Workshops",
+      category:"education",
+      description:"Suggest topics for future workshops and resource-sharing sessions, from navigating community services to practical parenting information. Content and facilitators will be confirmed after community input.",
+      service_area:"Online and regional options under consideration",
+      status:"Proposed — gathering interest"
+    },
+    {
+      id:"pnwm-community-volunteer-network",
+      name:"Community Volunteer & Partner Network",
+      category:"community",
+      description:"Connect with PNWM about volunteering, sharing verified resources or exploring collaboration with an organization that supports mothers and families.",
+      service_area:"Pacific Northwest",
+      status:"Open to expressions of interest"
+    },
+    {
+      id:"pnwm-family-practical-support",
+      name:"Family Practical Support Ideas",
+      category:"family",
+      description:"Help prioritize future community initiatives around everyday family needs. This is a planning and feedback opportunity, not a promise of direct financial aid, childcare or other services.",
+      service_area:"Pacific Northwest",
+      status:"Proposed — gathering interest"
+    }
+  ];
 }
 
 $("#eventSearch").addEventListener("input",applyEventFilters);
