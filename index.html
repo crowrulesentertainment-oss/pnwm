@@ -594,6 +594,25 @@ section{
   color:var(--muted);
 }
 
+.listing-tools{
+  display:grid;grid-template-columns:minmax(0,1.3fr) minmax(210px,.7fr);
+  gap:14px;align-items:end;margin:0 0 22px;padding:20px;
+  border:1px solid var(--border);border-radius:18px;background:rgba(255,255,255,.025)
+}
+.listing-count{grid-column:1/-1;margin:0;color:var(--muted);font-size:12px}
+.event[hidden],.program[hidden]{display:none!important}
+.event{transition:border-color .2s,transform .2s}
+.event:hover{border-color:rgba(217,139,135,.4);transform:translateY(-2px)}
+.event h3{margin:0 0 7px}
+.event p{overflow-wrap:anywhere}
+.event-actions,.program-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.event-link,.program-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:800;color:var(--rose2)}
+.program{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.program-tag{display:inline-flex;margin-bottom:12px;padding:5px 9px;border:1px solid var(--border);border-radius:999px;color:var(--rose2);font-size:11px;font-weight:800}
+.program p{overflow-wrap:anywhere}
+.program .program-actions{margin-top:auto;padding-top:8px}
+@media(max-width:620px){.listing-tools{grid-template-columns:1fr}.listing-count{grid-column:auto}}
+
 .resource-tools{
   display:grid;
   grid-template-columns:minmax(0,1.4fr) minmax(220px,.8fr);
@@ -1712,12 +1731,23 @@ footer a:hover{
 
     </div>
 
-    <div class="events" id="eventGrid">
-
-      <div class="loading">
-        Loading upcoming events…
+    <div class="listing-tools">
+      <div class="field">
+        <label for="eventSearch">Search events</label>
+        <input id="eventSearch" type="search" placeholder="Search by event, topic or location…" autocomplete="off">
       </div>
-
+      <div class="field">
+        <label for="eventTimeFilter">When</label>
+        <select id="eventTimeFilter">
+          <option value="upcoming">Upcoming events</option>
+          <option value="all">All announced events</option>
+          <option value="past">Past events</option>
+        </select>
+      </div>
+      <p class="listing-count" id="eventCount" aria-live="polite">Loading events…</p>
+    </div>
+    <div class="events" id="eventGrid" aria-live="polite">
+      <div class="loading">Loading upcoming events…</div>
     </div>
 
   </div>
@@ -1746,12 +1776,27 @@ footer a:hover{
 
     </div>
 
-    <div class="program-grid" id="programGrid">
-
-      <div class="loading">
-        Loading programs…
+    <div class="listing-tools program-tools">
+      <div class="field">
+        <label for="programSearch">Find a program</label>
+        <input id="programSearch" type="search" placeholder="Search programs and support…" autocomplete="off">
       </div>
-
+      <div class="field">
+        <label for="programCategoryFilter">Program focus</label>
+        <select id="programCategoryFilter">
+          <option value="all">All program areas</option>
+          <option value="family">Family & parenting</option>
+          <option value="wellbeing">Health & wellbeing</option>
+          <option value="community">Community & connection</option>
+          <option value="education">Education & resources</option>
+          <option value="practical">Practical assistance</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <p class="listing-count" id="programCount" aria-live="polite">Loading programs…</p>
+    </div>
+    <div class="program-grid" id="programGrid" aria-live="polite">
+      <div class="loading">Loading programs…</div>
     </div>
 
   </div>
@@ -2723,181 +2768,171 @@ $("#resourceSubmissionForm").addEventListener("submit",async event=>{
    LOAD EVENTS
 ========================================================= */
 
-async function loadEvents(){
-
-  const grid =
-    $("#eventGrid");
-
-  const { data,error } =
-    await supabaseClient
-      .from("mother_events")
-      .select("*")
-      .in("status",["published","planning"])
-      .order("event_date",{ascending:true});
-
-  if(error){
-
-    console.error(
-      "Event loading error:",
-      error
-    );
-
-    grid.innerHTML = `
-      <div class="loading">
-        Events are temporarily unavailable.
-      </div>
-    `;
-
-    return;
-  }
-
-  if(!data || data.length === 0){
-
-    grid.innerHTML = `
-      <div class="loading">
-        No events have been announced yet.
-        Future meetings and events will appear here.
-      </div>
-    `;
-
-    return;
-  }
-
-  grid.innerHTML =
-    data.map(event => {
-
-      let dateHTML = `
-        <strong>—</strong>
-        <span>TBA</span>
-      `;
-
-      if(event.event_date){
-
-        const date =
-          new Date(event.event_date);
-
-        dateHTML = `
-          <strong>${date.getDate()}</strong>
-          <span>
-            ${date.toLocaleDateString(
-              "en-US",
-              {month:"short"}
-            )}
-          </span>
-        `;
-
-      }
-
-      return `
-
-        <article class="event">
-
-          <div class="event-date">
-            ${dateHTML}
-          </div>
-
-          <div>
-
-            <h3>
-              ${escapeHTML(event.title)}
-            </h3>
-
-            <p>
-              ${escapeHTML(event.description || "")}
-            </p>
-
-            ${
-              event.location
-              ?
-              `
-              <p style="margin-top:5px">
-                📍 ${escapeHTML(event.location)}
-              </p>
-              `
-              :
-              ""
-            }
-
-          </div>
-
-          <div class="event-status">
-            ${escapeHTML(
-              String(event.status || "")
-                .replaceAll("_"," ")
-                .toUpperCase()
-            )}
-          </div>
-
-        </article>
-
-      `;
-
-    }).join("");
-
+function safeExternalUrl(value){
+  try{
+    const url=new URL(String(value || ""));
+    return url.protocol==="https:" ? url.href : "";
+  }catch{return "";}
 }
 
+let loadedEvents=[];
+let loadedPrograms=[];
 
-/* =========================================================
-   LOAD PROGRAMS
-========================================================= */
+function eventIsPast(event){
+  if(!event.event_date) return false;
+  const date=new Date(event.event_date);
+  if(Number.isNaN(date.getTime())) return false;
+  const eventDay=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+  const today=new Date();
+  today.setHours(0,0,0,0);
+  return eventDay<today;
+}
+
+function renderEvent(event){
+  let dateHTML='<strong>—</strong><span>TBA</span>';
+  if(event.event_date){
+    const date=new Date(event.event_date);
+    if(!Number.isNaN(date.getTime())){
+      dateHTML=`<strong>${date.getDate()}</strong><span>${date.toLocaleDateString("en-US",{month:"short"})}</span>`;
+    }
+  }
+  const registrationUrl=safeExternalUrl(event.registration_url || event.registration_link || event.website_url);
+  const eventUrl=safeExternalUrl(event.url);
+  const dateText=event.event_date ? new Date(event.event_date).toLocaleString("en-US",{dateStyle:"medium",timeStyle: event.event_date.includes("T") ? "short" : undefined}) : "Date to be announced";
+  return `
+    <article class="event">
+      <div class="event-date">${dateHTML}</div>
+      <div class="event-content">
+        <h3>${escapeHTML(event.title || "Community event")}</h3>
+        <p>${escapeHTML(event.description || "More details will be shared soon.")}</p>
+        <p class="event-detail"><strong>When:</strong> ${escapeHTML(dateText)}</p>
+        ${event.location ? `<p class="event-detail"><strong>Where:</strong> ${escapeHTML(event.location)}</p>` : ""}
+        ${event.event_type || event.category ? `<p class="event-detail"><strong>Type:</strong> ${escapeHTML(event.event_type || event.category)}</p>` : ""}
+        ${registrationUrl || eventUrl ? `<div class="event-actions">${registrationUrl ? `<a class="event-link" href="${escapeHTML(registrationUrl)}" target="_blank" rel="noopener noreferrer">Event details / registration ↗</a>` : ""}${eventUrl && eventUrl!==registrationUrl ? `<a class="event-link" href="${escapeHTML(eventUrl)}" target="_blank" rel="noopener noreferrer">More information ↗</a>` : ""}</div>` : ""}
+      </div>
+      <div class="event-status">${escapeHTML(String(event.status || "announced").replaceAll("_"," ").toUpperCase())}</div>
+    </article>`;
+}
+
+function applyEventFilters(){
+  const query=($("#eventSearch").value || "").trim().toLowerCase();
+  const timeframe=$("#eventTimeFilter").value;
+  const cards=[...$("#eventGrid").querySelectorAll(".event")];
+  let count=0;
+  cards.forEach((card,index)=>{
+    const event=loadedEvents[index];
+    const past=eventIsPast(event);
+    const timeMatch=timeframe==="all" || (timeframe==="past" ? past : !past);
+    const searchMatch=!query || (card.textContent+" "+String(event.location || "")).toLowerCase().includes(query);
+    card.hidden=!(timeMatch && searchMatch);
+    if(!card.hidden) count++;
+  });
+  $("#eventCount").textContent=count+(count===1?" event shown":" events shown")+(query || timeframe!=="upcoming"?" · Filters applied":"");
+  let empty=$("#eventNoResults");
+  if(!count){
+    if(!empty){empty=document.createElement("div");empty.id="eventNoResults";empty.className="loading";empty.textContent="No events match these filters. Try another search or select All announced events.";}
+    $("#eventGrid").appendChild(empty);empty.hidden=false;
+  }else if(empty){empty.hidden=true;}
+}
+
+async function loadEvents(){
+  const grid=$("#eventGrid");
+  try{
+    const {data,error}=await supabaseClient.from("mother_events").select("*").in("status",["published","planning"]).order("event_date",{ascending:true});
+    if(error) throw error;
+    loadedEvents=(data || []).filter(event=>event.title);
+    if(!loadedEvents.length){
+      grid.innerHTML='<div class="loading">No events have been announced yet. Check back for community meetings, workshops and gatherings.</div>';
+      $("#eventCount").textContent="No announced events yet";
+      return;
+    }
+    grid.innerHTML=loadedEvents.map(renderEvent).join("");
+    applyEventFilters();
+  }catch(error){
+    console.error("Event loading error:",error);
+    grid.innerHTML='<div class="loading">Events are temporarily unavailable. Please try again later.</div>';
+    $("#eventCount").textContent="Events could not be loaded";
+  }
+}
+
+const PROGRAM_CATEGORIES={
+  family:{label:"Family & parenting",terms:["family","parent","parenting","mother","child","caregiver","baby"]},
+  wellbeing:{label:"Health & wellbeing",terms:["health","wellbeing","wellness","mental","support group","postpartum","emotional"]},
+  community:{label:"Community & connection",terms:["community","connect","network","meet","peer","volunteer","social"]},
+  education:{label:"Education & resources",terms:["education","learn","workshop","resource","information","training","class"]},
+  practical:{label:"Practical assistance",terms:["food","housing","financial","childcare","utility","assistance","aid"]},
+  other:{label:"Other programs",terms:[]}
+};
+
+function programCategory(program){
+  const explicit=String(program.category || program.program_type || "").toLowerCase();
+  if(PROGRAM_CATEGORIES[explicit]) return explicit;
+  const text=[program.name,program.description,program.category,program.program_type].filter(Boolean).join(" ").toLowerCase();
+  for(const key of ["family","wellbeing","community","education","practical"]){
+    if(PROGRAM_CATEGORIES[key].terms.some(term=>text.includes(term))) return key;
+  }
+  return "other";
+}
+
+function renderProgram(program){
+  const category=programCategory(program);
+  const website=safeExternalUrl(program.website_url || program.website || program.url);
+  const signup=safeExternalUrl(program.signup_url || program.registration_url);
+  return `
+    <article class="program">
+      <span class="program-tag">${escapeHTML(PROGRAM_CATEGORIES[category].label)}</span>
+      <h3>${escapeHTML(program.name || "Community program")}</h3>
+      <p>${escapeHTML(program.description || "Program details will be available soon.")}</p>
+      ${program.service_area ? `<p><strong>Serves:</strong> ${escapeHTML(program.service_area)}</p>` : ""}
+      ${program.status && String(program.status).toLowerCase()!=="active" ? `<p><strong>Status:</strong> ${escapeHTML(program.status)}</p>` : ""}
+      ${website || signup ? `<div class="program-actions">${signup ? `<a class="program-link" href="${escapeHTML(signup)}" target="_blank" rel="noopener noreferrer">Join / learn more ↗</a>` : ""}${website && website!==signup ? `<a class="program-link" href="${escapeHTML(website)}" target="_blank" rel="noopener noreferrer">Program website ↗</a>` : ""}</div>` : ""}
+    </article>`;
+}
+
+function applyProgramFilters(){
+  const query=($("#programSearch").value || "").trim().toLowerCase();
+  const category=$("#programCategoryFilter").value;
+  const cards=[...$("#programGrid").querySelectorAll(".program")];
+  let count=0;
+  cards.forEach((card,index)=>{
+    const program=loadedPrograms[index];
+    const matchesCategory=category==="all" || programCategory(program)===category;
+    const matchesQuery=!query || (card.textContent+" "+String(program.service_area || "")).toLowerCase().includes(query);
+    card.hidden=!(matchesCategory && matchesQuery);
+    if(!card.hidden) count++;
+  });
+  $("#programCount").textContent=count+(count===1?" program shown":" programs shown")+(query || category!=="all"?" · Filters applied":"");
+  let empty=$("#programNoResults");
+  if(!count){
+    if(!empty){empty=document.createElement("div");empty.id="programNoResults";empty.className="loading";empty.textContent="No programs match these filters. Try a different search or choose All program areas.";}
+    $("#programGrid").appendChild(empty);empty.hidden=false;
+  }else if(empty){empty.hidden=true;}
+}
 
 async function loadPrograms(){
-
-  const grid =
-    $("#programGrid");
-
-  const { data,error } =
-    await supabaseClient
-      .from("mother_programs")
-      .select("*")
-      .eq("active",true)
-      .order("created_at",{ascending:false});
-
-  if(error){
-
-    console.error(
-      "Program loading error:",
-      error
-    );
-
-    grid.innerHTML = `
-      <div class="loading">
-        Programs are temporarily unavailable.
-      </div>
-    `;
-
-    return;
+  const grid=$("#programGrid");
+  try{
+    const {data,error}=await supabaseClient.from("mother_programs").select("*").eq("active",true).order("created_at",{ascending:false});
+    if(error) throw error;
+    loadedPrograms=(data || []).filter(program=>program.name);
+    if(!loadedPrograms.length){
+      grid.innerHTML='<div class="loading">Programs are currently being developed. Check back for new family support and community opportunities.</div>';
+      $("#programCount").textContent="No active programs listed yet";
+      return;
+    }
+    grid.innerHTML=loadedPrograms.map(renderProgram).join("");
+    applyProgramFilters();
+  }catch(error){
+    console.error("Program loading error:",error);
+    grid.innerHTML='<div class="loading">Programs are temporarily unavailable. Please try again later.</div>';
+    $("#programCount").textContent="Programs could not be loaded";
   }
-
-  if(!data || data.length === 0){
-
-    grid.innerHTML = `
-      <div class="loading">
-        Programs are currently being developed.
-      </div>
-    `;
-
-    return;
-  }
-
-  grid.innerHTML =
-    data.map(program => `
-
-      <article class="program">
-
-        <h3>
-          ${escapeHTML(program.name)}
-        </h3>
-
-        <p>
-          ${escapeHTML(program.description || "")}
-        </p>
-
-      </article>
-
-    `).join("");
-
 }
+
+$("#eventSearch").addEventListener("input",applyEventFilters);
+$("#eventTimeFilter").addEventListener("change",applyEventFilters);
+$("#programSearch").addEventListener("input",applyProgramFilters);
+$("#programCategoryFilter").addEventListener("change",applyProgramFilters);
 
 
 /* =========================================================
