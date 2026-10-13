@@ -1141,6 +1141,43 @@ footer a:hover{
   }
 
 }
+
+/* GIVE-BACK PROJECTS */
+.giveback-notice{padding:18px 20px;margin:0 0 22px;border:1px solid rgba(228,135,135,.32);border-radius:16px;background:rgba(228,135,135,.07)}
+.giveback-notice p{margin:6px 0 0;color:var(--muted);font-size:13px}
+.giveback-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 22px}
+.giveback-stat{padding:18px;border:1px solid var(--border);border-radius:16px;background:var(--panel);display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:12px}
+.giveback-stat-value{font-size:27px;line-height:1.2;font-weight:800;color:var(--text)}
+.giveback-layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(260px,.8fr);gap:18px;align-items:start}
+.giveback-project,.giveback-updates{padding:26px;border:1px solid var(--border);border-radius:20px;background:var(--panel)}
+.giveback-project h3,.giveback-updates h3{margin:12px 0 8px}
+.giveback-project p,.giveback-updates p{color:var(--muted);font-size:14px}
+.giveback-project-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center}
+.giveback-pill{display:inline-flex;padding:6px 10px;border-radius:999px;background:rgba(228,135,135,.12);color:var(--rose);font-size:11px;font-weight:800}
+.giveback-area{font-size:11px;color:var(--muted)}
+.giveback-needs{padding:16px;margin:18px 0;border-radius:14px;background:rgba(0,0,0,.13)}
+.giveback-needs h4,.giveback-partners h4{margin:0 0 8px}
+.giveback-needs ul{margin:0;padding-left:20px;color:var(--muted);font-size:13px;line-height:1.8}
+.giveback-progress-wrap{margin:18px 0}
+.giveback-progress-label{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px}
+.giveback-progress-label span{color:var(--muted)}
+.giveback-updates{min-width:0}
+.giveback-update{padding:13px 0;border-bottom:1px solid var(--border)}
+.giveback-update:last-child{border-bottom:0}
+.giveback-update time{font-size:11px;color:var(--muted)}
+.giveback-update h4{margin:5px 0}
+.giveback-partners{padding-top:15px;margin-top:15px;border-top:1px solid var(--border)}
+.giveback-partners a{color:var(--rose);overflow-wrap:anywhere}
+.giveback-forms{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
+.giveback-forms .form-card{border:1px solid var(--border);border-radius:20px;background:var(--panel)}
+.giveback-forms h3{margin:7px 0}
+.giveback-forms form{margin-top:18px}
+.giveback-consent{display:flex;align-items:flex-start;gap:10px;margin:16px 0;color:var(--muted);font-size:12px;line-height:1.55}
+.giveback-consent input{width:auto;min-width:16px;margin-top:3px}
+.giveback-privacy-note{max-width:900px;margin:18px auto 0;text-align:center;color:var(--muted);font-size:12px}
+.giveback-forms .form-message{margin-bottom:12px}
+@media(max-width:800px){.giveback-layout,.giveback-forms{grid-template-columns:1fr}.giveback-stats{grid-template-columns:1fr}.giveback-stat{flex-direction:row;justify-content:space-between;align-items:center}.giveback-stat-value{font-size:22px}}
+
 </style>
 </head>
 
@@ -1844,32 +1881,101 @@ footer a:hover{
 ======================================================= -->
 
 <section id="fundraisers">
-
   <div class="container">
-
     <div class="section-head">
-
-      <div class="section-label">Give-back projects</div>
-
-      <h2>Turn community support into action.</h2>
-
-      <p>
-        Active fundraising projects can be displayed here with live
-        progress from Supabase.
-      </p>
-
+      <div class="section-label">PNWM give-back projects</div>
+      <h2>Small acts. Real support. Stronger families.</h2>
+      <p>Our first community initiative is <strong>Mother &amp; Baby Essentials</strong> — a volunteer-led supply drive connecting approved baby and family essentials with established local organizations across the South Sound and Western Washington.</p>
     </div>
 
-    <div class="fundraiser-grid" id="fundraiserGrid">
-
-      <div class="loading">
-        Loading fundraising projects…
-      </div>
-
+    <div class="giveback-notice">
+      <strong>Supplies and volunteers — no cash fundraising.</strong>
+      <p>At launch, PNWM is coordinating in-kind supplies and unpaid volunteer interest. We are not collecting money through this project, and contributions are not represented as tax-deductible. Donation needs and drop-off arrangements must be confirmed before bringing items.</p>
     </div>
 
+    <div class="giveback-stats" id="givebackStats" aria-live="polite">
+      <div class="giveback-stat"><span class="giveback-stat-value" id="givebackCollected">—</span><span>items collected</span></div>
+      <div class="giveback-stat"><span class="giveback-stat-value" id="givebackDistributed">—</span><span>items distributed through partners</span></div>
+      <div class="giveback-stat"><span class="giveback-stat-value" id="givebackVolunteers">—</span><span>volunteer interests received</span></div>
+    </div>
+
+    <div class="giveback-layout">
+      <article class="giveback-project" id="motherBabyProject">
+        <div class="giveback-project-top">
+          <span class="giveback-pill">First project</span>
+          <span class="giveback-area">South Sound · Western Washington</span>
+        </div>
+        <h3>Mother &amp; Baby Essentials</h3>
+        <p>Help gather items that partner organizations have confirmed they can accept. Priorities may include new diapers, wipes, unopened hygiene supplies, and clean baby clothing in requested sizes.</p>
+        <div class="giveback-needs">
+          <h4>How you can help</h4>
+          <ul>
+            <li>Donate only items on the current approved needs list.</li>
+            <li>Volunteer to sort, inventory, or coordinate a supply drive.</li>
+            <li>Suggest a local organization that could receive supplies.</li>
+            <li>Share a community project idea for review.</li>
+          </ul>
+        </div>
+        <div class="giveback-progress-wrap">
+          <div class="giveback-progress-label"><strong>Supply drive progress</strong><span id="givebackProgressText">Progress updates coming soon</span></div>
+          <div class="progress" role="progressbar" aria-label="Mother and Baby Essentials collection progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-bar" id="givebackProgressBar"></div></div>
+          <p class="form-note" id="givebackProgressNote">Counts will appear after supplies are logged and verified. No estimated or placeholder totals are shown.</p>
+        </div>
+        <a class="btn btn-secondary" href="#givebackVolunteer">Volunteer to help</a>
+      </article>
+
+      <aside class="giveback-updates">
+        <h3>Project updates</h3>
+        <p class="form-note">Only updates reviewed and published by PNWM appear here.</p>
+        <div id="givebackUpdates" aria-live="polite"><p class="loading">Loading project updates…</p></div>
+        <div class="giveback-partners">
+          <h4>Potential community connections</h4>
+          <p>We will contact established family-serving organizations to confirm current needs and partnership interest before announcing collection or delivery arrangements.</p>
+          <p><a href="https://www.mcfhc.org/" target="_blank" rel="noopener noreferrer">Multicultural Child &amp; Family Hope Center</a></p>
+          <p><a href="https://www.pregnancyaidoftacoma.org/" target="_blank" rel="noopener noreferrer">Pregnancy Aid of Tacoma</a></p>
+          <p class="form-note">These are independent organizations, not confirmed PNWM partners. Please check their current donation policies directly.</p>
+        </div>
+      </aside>
+    </div>
+
+    <div class="giveback-forms">
+      <article class="form-card" id="givebackVolunteer">
+        <div class="section-label">Get involved</div>
+        <h3>Volunteer with the essentials project</h3>
+        <p>Tell us how you might help. This is an expression of interest, not a confirmed shift or commitment.</p>
+        <form id="givebackVolunteerForm">
+          <div class="form-grid">
+            <div class="field"><label for="givebackVolunteerName">Name *</label><input id="givebackVolunteerName" name="name" required maxlength="120" autocomplete="name"></div>
+            <div class="field"><label for="givebackVolunteerEmail">Email *</label><input id="givebackVolunteerEmail" name="email" type="email" required maxlength="254" autocomplete="email"></div>
+            <div class="field"><label for="givebackVolunteerArea">City or area *</label><input id="givebackVolunteerArea" name="area" required maxlength="120" placeholder="e.g. Tacoma, Lakewood, Olympia"></div>
+            <div class="field"><label for="givebackVolunteerInterest">How would you like to help? *</label><select id="givebackVolunteerInterest" name="interest" required><option value="">Choose one</option><option value="sorting">Sort and inventory approved supplies</option><option value="drive">Help coordinate a supply drive</option><option value="delivery">Help with partner-approved delivery logistics</option><option value="outreach">Contact potential community partners</option><option value="remote">Remote planning and communications</option><option value="other">Other volunteer support</option></select></div>
+            <div class="field full"><label for="givebackVolunteerAvailability">Availability (optional)</label><input id="givebackVolunteerAvailability" name="availability" maxlength="240" placeholder="Weekends, occasional evenings, remote…"></div>
+          </div>
+          <label class="giveback-consent"><input type="checkbox" id="givebackVolunteerConsent" required> I agree that PNWM may contact me about this volunteer interest. I will not include private health or family information.</label>
+          <button class="btn btn-primary" type="submit" id="givebackVolunteerSubmit">Send volunteer interest</button>
+          <div class="form-message" id="givebackVolunteerMessage" role="status" aria-live="polite"></div>
+        </form>
+      </article>
+
+      <article class="form-card" id="givebackIdea">
+        <div class="section-label">Community-powered</div>
+        <h3>Suggest a give-back project</h3>
+        <p>Share a practical idea or identify a local organization. Submissions are reviewed before anything is published or acted on.</p>
+        <form id="givebackIdeaForm">
+          <div class="form-grid">
+            <div class="field"><label for="givebackIdeaTitle">Idea or project name *</label><input id="givebackIdeaTitle" name="title" required maxlength="160"></div>
+            <div class="field"><label for="givebackIdeaArea">Community or area *</label><input id="givebackIdeaArea" name="area" required maxlength="120" placeholder="City, county, or region"></div>
+            <div class="field full"><label for="givebackIdeaDescription">What need would it address? *</label><textarea id="givebackIdeaDescription" name="description" required maxlength="1800" placeholder="Describe the community need and a practical, non-cash way to help."></textarea></div>
+            <div class="field"><label for="givebackIdeaContact">Email (optional)</label><input id="givebackIdeaContact" name="email" type="email" maxlength="254" autocomplete="email"></div>
+          </div>
+          <label class="giveback-consent"><input type="checkbox" id="givebackIdeaConsent" required> I understand this is a suggestion for review, not a promise of assistance or funding.</label>
+          <button class="btn btn-secondary" type="submit" id="givebackIdeaSubmit">Submit project idea</button>
+          <div class="form-message" id="givebackIdeaMessage" role="status" aria-live="polite"></div>
+        </form>
+      </article>
+    </div>
+    <p class="giveback-privacy-note">Please do not submit a family's name, medical details, home address, or other sensitive personal information. PNWM does not publish volunteer contact details, raw submissions, or identifiable recipient information.</p>
   </div>
-
 </section>
 
 
@@ -3078,114 +3184,102 @@ $("#programCategoryFilter").addEventListener("change",applyProgramFilters);
 ========================================================= */
 
 async function loadFundraisers(){
+  const updates = $("#givebackUpdates");
+  const setNumber = (id,value) => { const el=$("#"+id); if(el) el.textContent=Number(value||0).toLocaleString(); };
+  // Show an honest zero-state immediately. No sample totals are fabricated.
+  setNumber("givebackCollected",0);
+  setNumber("givebackDistributed",0);
+  setNumber("givebackVolunteers",0);
+  if(updates) updates.innerHTML='<p class="form-note">No published project updates yet. Check back as the drive develops.</p>';
 
-  const grid =
-    $("#fundraiserGrid");
-
-  const { data,error } =
-    await supabaseClient
-      .from("mother_fundraisers")
-      .select("*")
-      .eq("status","active")
-      .order("created_at",{ascending:false});
-
-  if(error){
-
-    console.error(
-      "Fundraiser loading error:",
-      error
-    );
-
-    grid.innerHTML = `
-      <div class="loading">
-        Fundraising information is temporarily unavailable.
-      </div>
-    `;
-
-    return;
+  try{
+    const client = requestsSupabaseClient || supabaseClient;
+    const timeout = new Promise((_,reject)=>setTimeout(()=>reject(new Error("Give-back data request timed out")),6500));
+    const query = client.from("pnwm_giveback_projects").select("*").eq("slug","mother-baby-essentials").eq("status","published").maybeSingle();
+    const result = await Promise.race([query,timeout]);
+    if(result.error) throw result.error;
+    const project=result.data;
+    if(project){
+      setNumber("givebackCollected",project.collected_items);
+      setNumber("givebackDistributed",project.distributed_items);
+      setNumber("givebackVolunteers",project.volunteer_count_public);
+      const goal=Number(project.target_items||0), collected=Number(project.collected_items||0);
+      const percent=goal>0?Math.min(100,Math.round(collected/goal*100)):0;
+      const bar=$("#givebackProgressBar"), label=$("#givebackProgressText"), note=$("#givebackProgressNote"), progress=bar?.parentElement;
+      if(bar) bar.style.width=percent+"%";
+      if(label) label.textContent=goal>0?collected.toLocaleString()+" of "+goal.toLocaleString()+" items ("+percent+"%)":"Target to be announced";
+      if(progress) progress.setAttribute("aria-valuenow",String(percent));
+      if(note) note.textContent=project.last_verified_at?"Counts last verified "+new Date(project.last_verified_at).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})+". Totals reflect logged supplies, not monetary donations.":"Counts are based on project records; verification date has not been published yet.";
+    }
+    const updatesQuery=client.from("pnwm_giveback_updates").select("title,body,published_at").eq("project_slug","mother-baby-essentials").eq("status","published").order("published_at",{ascending:false}).limit(4);
+    const updateResult=await Promise.race([updatesQuery,timeout]);
+    if(updateResult.error) throw updateResult.error;
+    if(updates && updateResult.data && updateResult.data.length){
+      updates.innerHTML=updateResult.data.map(item=>'<article class="giveback-update"><time datetime="'+escapeHTML(item.published_at||"")+'">'+(item.published_at?new Date(item.published_at).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"}):"Project update")+'</time><h4>'+escapeHTML(item.title)+'</h4><p>'+escapeHTML(item.body)+'</p></article>').join("");
+    }
+  }catch(error){
+    console.warn("Give-back project data unavailable; keeping the safe zero-state.",error);
+    if(updates) updates.innerHTML='<p class="form-note">Live updates are not available right now. Project progress will appear here when verified data is published.</p>';
   }
-
-  if(!data || data.length === 0){
-
-    grid.innerHTML = `
-      <div class="loading">
-        Future fundraising projects will appear here.
-      </div>
-    `;
-
-    return;
-  }
-
-  grid.innerHTML =
-    data.map(item => {
-
-      const goal =
-        Number(item.goal || 0);
-
-      const raised =
-        Number(item.amount_raised || 0);
-
-      let percent = 0;
-
-      if(goal > 0){
-
-        percent =
-          Math.min(
-            100,
-            Math.max(
-              0,
-              (raised / goal) * 100
-            )
-          );
-
-      }
-
-      return `
-
-        <article class="fundraiser">
-
-          <h3>
-            ${escapeHTML(item.title)}
-          </h3>
-
-          <p>
-            ${escapeHTML(item.description || "")}
-          </p>
-
-          <div class="progress">
-            <div
-              class="progress-bar"
-              style="width:${percent}%"
-            ></div>
-          </div>
-
-          <div class="fundraiser-meta">
-
-            <span>
-              $${raised.toLocaleString()}
-              raised
-            </span>
-
-            <span>
-              ${
-                goal > 0
-                ?
-                "$" + goal.toLocaleString() + " goal"
-                :
-                "Goal TBA"
-              }
-            </span>
-
-          </div>
-
-        </article>
-
-      `;
-
-    }).join("");
-
 }
 
+async function submitGivebackForm({formId,buttonId,messageId,table,payload,successMessage}){
+  const form=$("#"+formId), button=$("#"+buttonId), message=$("#"+messageId);
+  if(!form||!button||!message) return;
+  const data=new FormData(form);
+  const fields=payload(data);
+  setLoading(button,true,"Submitting…");
+  message.className="form-message";
+  message.textContent="";
+  try{
+    const {error}=await requestsSupabaseClient.from(table).insert(fields);
+    if(error) throw error;
+    setFormMessage(message,successMessage,"success");
+    form.reset();
+    showToast("Your submission has been received.");
+  }catch(error){
+    console.error("Give-back form submission error:",error);
+    setFormMessage(message,"We couldn't submit this form right now. Please try again later.","error");
+  }finally{
+    setLoading(button,false);
+  }
+}
+
+$("#givebackVolunteerForm")?.addEventListener("submit",event=>{
+  event.preventDefault();
+  submitGivebackForm({
+    formId:"givebackVolunteerForm",buttonId:"givebackVolunteerSubmit",messageId:"givebackVolunteerMessage",
+    table:"pnwm_giveback_volunteer_signups",
+    payload:data=>({
+      name:String(data.get("name")||"").trim(),
+      email:String(data.get("email")||"").trim().toLowerCase(),
+      area:String(data.get("area")||"").trim(),
+      interest:String(data.get("interest")||"").trim(),
+      availability:String(data.get("availability")||"").trim()||null,
+      project_slug:"mother-baby-essentials",
+      consent:true,
+      status:"pending"
+    }),
+    successMessage:"Thank you! Your volunteer interest has been sent for review. This is not a confirmed shift; PNWM will contact you if next steps are available."
+  });
+});
+
+$("#givebackIdeaForm")?.addEventListener("submit",event=>{
+  event.preventDefault();
+  submitGivebackForm({
+    formId:"givebackIdeaForm",buttonId:"givebackIdeaSubmit",messageId:"givebackIdeaMessage",
+    table:"pnwm_giveback_ideas",
+    payload:data=>({
+      title:String(data.get("title")||"").trim(),
+      area:String(data.get("area")||"").trim(),
+      description:String(data.get("description")||"").trim(),
+      email:String(data.get("email")||"").trim().toLowerCase()||null,
+      consent:true,
+      status:"pending"
+    }),
+    successMessage:"Thank you for sharing your idea. It has been sent for review and is not automatically published or approved."
+  });
+});
 
 /* =========================================================
    SUPPORT REQUEST
