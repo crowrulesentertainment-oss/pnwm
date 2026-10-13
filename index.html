@@ -1213,7 +1213,7 @@ footer a:hover{
       <a href="#resources">Resources</a>
       <a href="#events">Events</a>
       <a href="#programs">Programs</a>
-      <a href="#fundraisers">Give-back</a>
+      <a href="#giveback">Give-back</a>
       <a href="#meetings">Meetings</a>
       <a href="#support" class="nav-cta">Get Support</a>
     </nav>
@@ -1627,15 +1627,15 @@ footer a:hover{
 
         <div class="icon">$</div>
 
-        <h3>Support the Mission</h3>
+        <h3>Help the Community</h3>
 
         <p>
-          Help with community supply drives, volunteer coordination,
+          Help with volunteer coordination, community information,
           and practical essentials for mothers and babies.
         </p>
 
-        <a href="#fundraisers" class="card-link">
-          See fundraisers →
+        <a href="#giveback" class="card-link">
+          Explore give-back projects →
         </a>
 
       </div>
@@ -1878,10 +1878,10 @@ footer a:hover{
 
 
 <!-- =======================================================
-     FUNDRAISERS
+     GIVE-BACK PROJECTS — NON-MONETARY ONLY
 ======================================================= -->
 
-<section id="fundraisers">
+<section id="giveback">
   <div class="container">
     <div class="section-head">
       <div class="section-label">PNWM give-back projects</div>
@@ -1890,8 +1890,8 @@ footer a:hover{
     </div>
 
     <div class="giveback-notice">
-      <strong>Supplies and volunteers — no cash fundraising.</strong>
-      <p>At launch, PNWM is coordinating in-kind supplies and unpaid volunteer interest. We are not collecting money through this project, and contributions are not represented as tax-deductible. Donation needs and drop-off arrangements must be confirmed before bringing items.</p>
+      <strong>Community participation is non-monetary only.</strong>
+      <p>PNWM does not request or accept money, payments, financial pledges, or fundraising contributions. This project may coordinate volunteer interest and physical items only after a receiving organization confirms its current needs and intake arrangements. PNWM is not represented as a registered charity, and no tax benefit is promised.</p>
     </div>
 
     <div class="giveback-stats" id="givebackStats" aria-live="polite">
@@ -1911,7 +1911,7 @@ footer a:hover{
         <div class="giveback-needs">
           <h4>How you can help</h4>
           <ul>
-            <li>Donate only items on the current approved needs list.</li>
+            <li>Offer only items on a current, partner-approved needs list.</li>
             <li>Volunteer to sort, inventory, or coordinate a supply drive.</li>
             <li>Suggest a local organization that could receive supplies.</li>
             <li>Share a community project idea for review.</li>
@@ -2299,6 +2299,14 @@ footer a:hover{
 
 </main>
 
+<section aria-labelledby="site-legal-summary" style="padding:30px 0;border-top:1px solid var(--border)">
+  <div class="container">
+    <h2 id="site-legal-summary" style="font-family:'Playfair Display',serif;font-size:25px">About this community initiative</h2>
+    <p style="max-width:900px;color:var(--muted)">Pacific Northwest Mother's (PNWM) is a community initiative operated by CrowRules Entertainment. It is not a government agency and is not presented as a registered nonprofit or charity. PNWM does not request or accept money, payments, financial pledges, or monetary donations. Volunteer participation and any in-kind item coordination are subject to review and confirmed arrangements.</p>
+    <p style="max-width:900px;color:var(--muted)">Resource and event information may change; please confirm details directly with the organization providing the service. Do not submit urgent requests, medical details, children's personal information, or other sensitive information through website forms.</p>
+    <p><a href="legal.html" style="color:var(--rose2);font-weight:800">Read the Legal Notice</a> · <a href="privacy.html" style="color:var(--rose2);font-weight:800">Read the Privacy Policy</a></p>
+  </div>
+</section>
 
 <!-- =======================================================
      FOOTER
@@ -2349,6 +2357,8 @@ footer a:hover{
         <a href="#meetings">Meetings</a>
         <a href="#support">Get Support</a>
         <a href="#contact">Contact</a>
+        <a href="legal.html">Legal Notice</a>
+        <a href="privacy.html">Privacy Policy</a>
 
       </div>
 
@@ -3184,7 +3194,7 @@ $("#programCategoryFilter").addEventListener("change",applyProgramFilters);
    LOAD FUNDRAISERS
 ========================================================= */
 
-async function loadFundraisers(){
+async function loadGivebackProject(){
   const updates = $("#givebackUpdates");
   const setNumber = (id,value) => { const el=$("#"+id); if(el) el.textContent=Number(value||0).toLocaleString(); };
   // Show an honest zero-state immediately. No sample totals are fabricated.
@@ -3729,7 +3739,7 @@ async function initializeApp(){
     loadResources(),
     loadEvents(),
     loadPrograms(),
-    loadFundraisers()
+    loadGivebackProject()
   ]);
 
 }
