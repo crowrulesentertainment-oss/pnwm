@@ -594,6 +594,17 @@ section{
   color:var(--muted);
 }
 
+.action-button{background:transparent;border:1px solid currentColor;border-radius:999px;padding:9px 13px;font:inherit;font-weight:800;cursor:pointer}
+.action-button:hover{background:rgba(217,139,135,.09)}
+.application-overlay{position:fixed;inset:0;z-index:10000;background:rgba(12,13,18,.78);backdrop-filter:blur(8px);display:grid;place-items:center;padding:18px;overflow:auto}
+.application-overlay[hidden]{display:none!important}
+.application-dialog{position:relative;width:min(100%,620px);max-height:calc(100vh - 36px);overflow:auto;padding:clamp(22px,5vw,38px);border:1px solid var(--border);border-radius:22px;background:var(--surface,#fff);box-shadow:0 25px 90px rgba(0,0,0,.28)}
+.application-dialog h2{margin:8px 36px 10px 0}.application-dialog form{display:grid;gap:15px;margin-top:22px}
+.application-dialog .field{display:grid;gap:7px}.application-dialog input:not([type=checkbox]),.application-dialog select,.application-dialog textarea{width:100%;min-width:0;padding:12px 13px;border:1px solid var(--border);border-radius:10px;background:transparent;color:inherit;font:inherit}
+.application-dialog label{font-weight:700;font-size:13px}.application-close{position:absolute;right:16px;top:12px;width:38px;height:38px;border:1px solid var(--border);border-radius:50%;background:transparent;color:inherit;font-size:26px;cursor:pointer}
+.application-consent{display:flex;gap:10px;align-items:flex-start}.application-consent input{margin-top:4px}.application-message{margin:0;font-size:13px}.application-message:empty{display:none}
+.application-message.success{color:#20744a}.application-message.error{color:#b42318}.application-trap{position:absolute!important;left:-10000px!important;width:1px;height:1px;overflow:hidden}
+.primary-button{justify-self:start;border:0;border-radius:999px;padding:12px 20px;background:var(--rose,#b96d73);color:white;font:inherit;font-weight:800;cursor:pointer}.primary-button:disabled{opacity:.6;cursor:wait}
 .listing-tools{
   display:grid;grid-template-columns:minmax(0,1.3fr) minmax(210px,.7fr);
   gap:14px;align-items:end;margin:0 0 22px;padding:20px;
@@ -1712,6 +1723,30 @@ footer a:hover{
 
 
 <!-- =======================================================
+     EVENT REGISTRATION / PROGRAM INTEREST FORMS
+======================================================= -->
+<div class="application-overlay" id="applicationOverlay" hidden>
+  <section class="application-dialog" role="dialog" aria-modal="true" aria-labelledby="applicationTitle">
+    <button type="button" class="application-close" id="applicationClose" aria-label="Close form">×</button>
+    <div class="section-label" id="applicationEyebrow">Community connection</div>
+    <h2 id="applicationTitle">Get involved</h2>
+    <p id="applicationIntro">Share your details to get started.</p>
+    <form id="communityApplicationForm">
+      <input type="hidden" id="applicationKind" name="kind"><input type="hidden" id="applicationItemId" name="item_id"><input type="hidden" id="applicationItemTitle" name="item_title">
+      <div class="field"><label for="applicationName">Your name *</label><input id="applicationName" name="name" required maxlength="120" autocomplete="name"></div>
+      <div class="field"><label for="applicationEmail">Email address *</label><input id="applicationEmail" name="email" type="email" required maxlength="254" autocomplete="email"></div>
+      <div class="field"><label for="applicationPhone">Phone (optional)</label><input id="applicationPhone" name="phone" type="tel" maxlength="40" autocomplete="tel"></div>
+      <div class="field" id="attendeeCountWrap"><label for="applicationAttendees">Number attending</label><select id="applicationAttendees" name="attendees"><option value="1">1 person</option><option value="2">2 people</option><option value="3">3 people</option><option value="4">4 people</option><option value="5">5 people</option></select></div>
+      <div class="field"><label for="applicationMessage">Anything you'd like us to know? (optional)</label><textarea id="applicationMessage" name="message" rows="4" maxlength="1500" placeholder="Share access needs or questions. Please avoid sensitive personal details."></textarea></div>
+      <div class="application-trap" aria-hidden="true"><label for="applicationCompany">Leave this field empty</label><input id="applicationCompany" name="company" tabindex="-1" autocomplete="off"></div>
+      <label class="application-consent"><input id="applicationConsent" type="checkbox" required> I agree that PNWM may use these details to respond to this request.</label>
+      <p class="application-message" id="applicationMessageStatus" aria-live="polite"></p>
+      <button type="submit" class="primary-button" id="applicationSubmit">Send request</button>
+    </form>
+  </section>
+</div>
+
+<!-- =======================================================
      DYNAMIC EVENTS
 ======================================================= -->
 
@@ -2765,6 +2800,47 @@ $("#resourceSubmissionForm").addEventListener("submit",async event=>{
 
 
 /* =========================================================
+   SECURE COMMUNITY REQUEST WORKFLOW
+========================================================= */
+function setApplicationMessage(message,type=""){
+  const node=$("#applicationMessageStatus");node.textContent=message;node.className="application-message"+(type?" "+type:"");
+}
+function openCommunityApplication(kind,item){
+  const isEvent=kind==="event";$("#communityApplicationForm").reset();
+  $("#applicationKind").value=kind;$("#applicationItemId").value=String(item.id ?? "");$("#applicationItemTitle").value=String(isEvent?item.title:item.name);
+  $("#applicationTitle").textContent=isEvent?"Request an event place":"Express program interest";
+  $("#applicationEyebrow").textContent=isEvent?"Event registration request":"Program application";
+  $("#applicationIntro").textContent=(isEvent?"Request a place for: ":"Tell us you're interested in: ")+String(isEvent?item.title:item.name)+". Requests are reviewed by the PNWM team; submitting does not guarantee a place or acceptance.";
+  $("#attendeeCountWrap").hidden=!isEvent;$("#applicationAttendees").required=isEvent;
+  $("#applicationSubmit").textContent=isEvent?"Send registration request":"Send interest request";
+  setApplicationMessage("");$("#applicationOverlay").hidden=false;document.body.style.overflow="hidden";$("#applicationName").focus();
+}
+function closeCommunityApplication(){$("#applicationOverlay").hidden=true;document.body.style.overflow="";}
+$("#eventGrid").addEventListener("click",event=>{const button=event.target.closest("[data-register-event]");if(!button)return;const item=loadedEvents.find(row=>String(row.id??row.title)===button.dataset.registerEvent);if(item)openCommunityApplication("event",item);});
+$("#programGrid").addEventListener("click",event=>{const button=event.target.closest("[data-apply-program]");if(!button)return;const item=loadedPrograms.find(row=>String(row.id??row.name)===button.dataset.applyProgram);if(item)openCommunityApplication("program",item);});
+$("#applicationClose").addEventListener("click",closeCommunityApplication);
+$("#applicationOverlay").addEventListener("click",event=>{if(event.target===$("#applicationOverlay"))closeCommunityApplication();});
+document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!$("#applicationOverlay").hidden)closeCommunityApplication();});
+$("#communityApplicationForm").addEventListener("submit",async event=>{
+  event.preventDefault();const form=event.currentTarget;if($("#applicationCompany").value.trim())return;
+  if(!$("#applicationConsent").checked){setApplicationMessage("Please confirm that PNWM may use your details to respond.","error");return;}
+  const kind=$("#applicationKind").value,title=$("#applicationItemTitle").value.trim();
+  const payload={item_id:$("#applicationItemId").value||null,item_title:title,name:$("#applicationName").value.trim(),email:$("#applicationEmail").value.trim().toLowerCase(),phone:$("#applicationPhone").value.trim()||null,message:$("#applicationMessage").value.trim()||null,review_status:"pending"};
+  if(!payload.name||!payload.email||!title){setApplicationMessage("Please complete the required fields and try again.","error");return;}
+  if(kind==="event")payload.attendees=Number($("#applicationAttendees").value)||1;
+  const table=kind==="event"?"mother_event_registration_requests":"mother_program_application_requests",button=$("#applicationSubmit");
+  button.disabled=true;button.textContent="Sending…";setApplicationMessage("");
+  try{
+    const {error}=await supabaseClient.from(table).insert(payload);if(error)throw error;
+    setApplicationMessage("Thank you. Your request has been received for review. The PNWM team can follow up using your contact details.","success");showToast("Your request has been submitted.");
+    form.reset();$("#applicationKind").value=kind;$("#applicationItemId").value=payload.item_id||"";$("#applicationItemTitle").value=title;
+  }catch(error){
+    console.error("Community request submission failed:",error);
+    setApplicationMessage("We couldn't submit this request yet. The PNWM registration tables may not be installed in Supabase. Please try again later or contact the community team.","error");
+  }finally{button.disabled=false;button.textContent=kind==="event"?"Send registration request":"Send interest request";}
+});
+
+/* =========================================================
    LOAD EVENTS
 ========================================================= */
 
@@ -2811,6 +2887,7 @@ function renderEvent(event){
         ${registrationUrl || eventUrl ? `<div class="event-actions">${registrationUrl ? `<a class="event-link" href="${escapeHTML(registrationUrl)}" target="_blank" rel="noopener noreferrer">Event details / registration ↗</a>` : ""}${eventUrl && eventUrl!==registrationUrl ? `<a class="event-link" href="${escapeHTML(eventUrl)}" target="_blank" rel="noopener noreferrer">More information ↗</a>` : ""}</div>` : ""}
       </div>
       <div class="event-status">${escapeHTML(String(event.status || "announced").replaceAll("_"," ").toUpperCase())}</div>
+      <div class="event-actions"><button type="button" class="event-link action-button" data-register-event="${escapeHTML(String(event.id ?? event.title))}">Request a place →</button></div>
     </article>`;
 }
 
@@ -2886,6 +2963,7 @@ function renderProgram(program){
       ${program.service_area ? `<p><strong>Serves:</strong> ${escapeHTML(program.service_area)}</p>` : ""}
       ${program.status && String(program.status).toLowerCase()!=="active" ? `<p><strong>Status:</strong> ${escapeHTML(program.status)}</p>` : ""}
       ${website || signup ? `<div class="program-actions">${signup ? `<a class="program-link" href="${escapeHTML(signup)}" target="_blank" rel="noopener noreferrer">Join / learn more ↗</a>` : ""}${website && website!==signup ? `<a class="program-link" href="${escapeHTML(website)}" target="_blank" rel="noopener noreferrer">Program website ↗</a>` : ""}</div>` : ""}
+      <div class="program-actions"><button type="button" class="program-link action-button" data-apply-program="${escapeHTML(String(program.id ?? program.name))}">Apply / express interest →</button></div>
     </article>`;
 }
 
