@@ -30,7 +30,7 @@ For the pnwm_giveback_* tables in that same project, RLS is enabled. Published p
 
 ## Not yet verified / required before calling the site fully reviewed
 
-1. The homepage also uses a second Supabase project for mother_resources, mother_resource_submissions, mother_events, mother_programs, mother_support_requests, mother_meeting_interest, mother_volunteers, and mother_partners. The connected Supabase workspace did not grant access to inspect that project. Its RLS policies, table/column grants, retention settings, and any stored data still need a separate review.
+1. The website no longer uses the former second Supabase project. Its prior data was not accessible for migration, so only the schema—not existing rows—was recreated in the approved project. Any records that existed only in the former project are not available through the current PNWM website. Verify content and form submissions only in the approved project going forward.
 2. The published GitHub Pages experience could not be confirmed end-to-end in this pass. The repository files and inline JavaScript syntax were checked, but each form should still be tested in a real browser, including successful submission, invalid input, failure states, mobile layouts, keyboard navigation, and privacy links.
 3. Confirm the real-world operator/contact details, who is authorized to read form submissions, how deletion requests are handled, and a documented retention schedule. The published privacy policy must match actual operations.
 4. Confirm whether PNWM is operated as an informal initiative, sole proprietorship, LLC, corporation, or another structure; do not imply nonprofit or tax-exempt status without proper basis.
