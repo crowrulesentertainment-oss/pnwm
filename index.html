@@ -594,6 +594,37 @@ section{
   color:var(--muted);
 }
 
+.resource-tools{
+  display:grid;
+  grid-template-columns:minmax(0,1.4fr) minmax(220px,.8fr);
+  gap:14px;
+  align-items:end;
+  margin:0 0 12px;
+  padding:20px;
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:rgba(255,255,255,.025);
+}
+.resource-tools .field{min-width:0}
+.resource-results{grid-column:1/-1;margin:0;color:var(--muted);font-size:12px}
+.resource-submit-panel{
+  display:flex;align-items:center;justify-content:space-between;gap:22px;
+  margin-top:24px;padding:26px;border:1px solid rgba(217,139,135,.22);
+  border-radius:20px;background:linear-gradient(130deg,rgba(217,139,135,.10),rgba(255,255,255,.02));
+}
+.resource-submit-panel h3{margin:7px 0;font-family:"Playfair Display",serif;font-size:25px}
+.resource-submit-panel p{margin:0;color:var(--muted);font-size:14px}
+.resource-form-wrap{max-width:900px;margin:20px auto 0}
+.resource-form-wrap h3{margin-top:0;font-family:"Playfair Display",serif;font-size:27px}
+.resource-form-wrap .btn-secondary{margin-left:8px}
+.resource[hidden]{display:none!important}
+@media(max-width:620px){
+  .resource-tools{grid-template-columns:1fr}
+  .resource-results{grid-column:auto}
+  .resource-submit-panel{align-items:flex-start;flex-direction:column}
+  .resource-form-wrap .btn-secondary{margin:10px 0 0}
+}
+
 /* =========================================================
    EVENTS
 ========================================================= */
@@ -1569,12 +1600,91 @@ footer a:hover{
 
     </div>
 
-    <div class="resource-grid" id="resourceGrid">
-
-      <div class="loading">
-        Loading community resources…
+    <div class="resource-tools" aria-label="Search and filter resources">
+      <div class="resource-search">
+        <label for="resourceSearch">Search resources</label>
+        <input id="resourceSearch" type="search" placeholder="Try food, rent, childcare, postpartum…" autocomplete="off">
       </div>
+      <div class="resource-filter">
+        <label for="resourceCategory">Filter by category</label>
+        <select id="resourceCategory">
+          <option value="all">All categories</option>
+          <option value="food">Food & nutrition</option>
+          <option value="housing">Housing & utilities</option>
+          <option value="childcare">Childcare & parenting</option>
+          <option value="financial">Financial assistance</option>
+          <option value="mental-health">Mental health & crisis support</option>
+          <option value="safety">Safety & advocacy</option>
+          <option value="health">Health & family benefits</option>
+          <option value="other">Other resources</option>
+        </select>
+      </div>
+      <p class="resource-results" id="resourceResults" aria-live="polite">Loading resources…</p>
+    </div>
 
+    <div class="resource-grid" id="resourceGrid" aria-live="polite">
+      <div class="loading">Loading community resources…</div>
+    </div>
+
+    <div class="resource-submit-panel">
+      <div>
+        <div class="section-label">Community-powered directory</div>
+        <h3>Know a resource that could help?</h3>
+        <p>Suggest a local organization or service. Submissions are sent for review and are not published automatically.</p>
+      </div>
+      <button class="btn btn-primary" type="button" id="openResourceSubmission">Suggest a Resource</button>
+    </div>
+
+    <div class="resource-form-wrap hidden" id="resourceSubmissionPanel">
+      <form class="form-card" id="resourceSubmissionForm">
+        <h3>Suggest a community resource</h3>
+        <p class="form-note">Please share public, useful information only. Do not include private details about anyone seeking help.</p>
+        <div class="form-grid">
+          <div class="field">
+            <label for="suggestionName">Organization or service *</label>
+            <input id="suggestionName" name="organization_name" required maxlength="160" autocomplete="organization">
+          </div>
+          <div class="field">
+            <label for="suggestionCategory">Category *</label>
+            <select id="suggestionCategory" name="category" required>
+              <option value="">Choose a category</option>
+              <option value="food">Food & nutrition</option>
+              <option value="housing">Housing & utilities</option>
+              <option value="childcare">Childcare & parenting</option>
+              <option value="financial">Financial assistance</option>
+              <option value="mental-health">Mental health & crisis support</option>
+              <option value="safety">Safety & advocacy</option>
+              <option value="health">Health & family benefits</option>
+              <option value="other">Other resources</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="suggestionDescription">What help does it offer? *</label>
+            <textarea id="suggestionDescription" name="description" required maxlength="1500" placeholder="Briefly describe the service and who it may help."></textarea>
+          </div>
+          <div class="field">
+            <label for="suggestionWebsite">Website (https://)</label>
+            <input id="suggestionWebsite" name="website" type="url" maxlength="500" placeholder="https://example.org">
+          </div>
+          <div class="field">
+            <label for="suggestionPhone">Public phone number</label>
+            <input id="suggestionPhone" name="phone" type="tel" maxlength="60">
+          </div>
+          <div class="field">
+            <label for="suggestionEmail">Your email (optional)</label>
+            <input id="suggestionEmail" name="submitter_email" type="email" maxlength="254" autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="suggestionArea">City or area served (optional)</label>
+            <input id="suggestionArea" name="service_area" maxlength="160" placeholder="e.g. Tacoma / Pierce County">
+          </div>
+          <div class="field full">
+            <button class="btn btn-primary" id="resourceSuggestionSubmit" type="submit">Send for Review</button>
+            <button class="btn btn-secondary" type="button" id="cancelResourceSubmission">Cancel</button>
+            <div class="form-message" id="resourceSuggestionMessage" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+      </form>
     </div>
 
   </div>
@@ -2464,116 +2574,149 @@ $("#year").textContent =
    LOAD RESOURCES
 ========================================================= */
 
-async function loadResources(){
+const RESOURCE_CATEGORIES = {
+  food: {label:"Food & nutrition", terms:["food","wic","nutrition","meal","pantry","hunger","grocery"]},
+  housing: {label:"Housing & utilities", terms:["housing","rent","utility","utilities","shelter","homeless","eviction","energy"]},
+  childcare: {label:"Childcare & parenting", terms:["childcare","child care","parent","parenting","family","children","kids","caregiver"]},
+  financial: {label:"Financial assistance", terms:["financial","cash","tanf","benefit","assistance","income","money","dshs","bill"]},
+  "mental-health": {label:"Mental health & crisis support", terms:["mental","health crisis","988","postpartum","emotional","suicide","counsel","therapy","stress","wellbeing"]},
+  safety: {label:"Safety & advocacy", terms:["safety","domestic violence","violence","abuse","advocacy","wscadv","crisis shelter"]},
+  health: {label:"Health & family benefits", terms:["health","wic","pregnan","postpartum","medical","insurance","clinic","benefit"]},
+  other: {label:"Other resources", terms:[]}
+};
 
+let allResources = [];
+
+function inferResourceCategory(resource){
+  const explicit = String(resource.category || "").toLowerCase().trim();
+  if(RESOURCE_CATEGORIES[explicit]) return explicit;
+  const haystack = [resource.name,resource.description,resource.category,resource.service_area].filter(Boolean).join(" ").toLowerCase();
+  for(const key of ["food","housing","childcare","financial","mental-health","safety","health"]){
+    if(RESOURCE_CATEGORIES[key].terms.some(term=>haystack.includes(term))) return key;
+  }
+  return "other";
+}
+
+function renderResource(resource){
+  const category = inferResourceCategory(resource);
+  const safeWebsite = /^https:\/\//i.test(String(resource.website || "")) ? String(resource.website) : "";
+  const searchable = [resource.name,resource.description,resource.category,resource.phone,resource.service_area].filter(Boolean).join(" ").toLowerCase();
+  return `
+    <article class="resource" data-category="${escapeHTML(category)}" data-search="${escapeHTML(searchable)}">
+      <span class="resource-tag">${escapeHTML(RESOURCE_CATEGORIES[category].label)}</span>
+      <h3>${escapeHTML(resource.name || "Resource")}</h3>
+      <p>${escapeHTML(resource.description || "")}</p>
+      ${resource.service_area ? `<p><strong>Serves:</strong> ${escapeHTML(resource.service_area)}</p>` : ""}
+      ${safeWebsite ? `<a href="${escapeHTML(safeWebsite)}" target="_blank" rel="noopener noreferrer">Visit resource ↗</a>` : ""}
+      ${resource.phone ? `<p style="margin-top:10px"><strong>${escapeHTML(resource.phone)}</strong></p>` : ""}
+    </article>`;
+}
+
+function applyResourceFilters(){
+  const query = ($("#resourceSearch").value || "").trim().toLowerCase();
+  const category = $("#resourceCategory").value;
+  const cards = [...$("#resourceGrid").querySelectorAll(".resource")];
+  let visible = 0;
+  cards.forEach(card=>{
+    const matchesCategory = category === "all" || card.dataset.category === category;
+    const matchesQuery = !query || (card.dataset.search + " " + card.textContent.toLowerCase()).includes(query);
+    card.hidden = !(matchesCategory && matchesQuery);
+    if(!card.hidden) visible++;
+  });
+  $("#resourceResults").textContent = visible + (visible === 1 ? " resource found" : " resources found") +
+    (query || category !== "all" ? " · Filters applied" : "");
+  let empty = $("#resourceNoResults");
+  if(!visible){
+    if(!empty){
+      empty = document.createElement("div");
+      empty.id = "resourceNoResults";
+      empty.className = "loading";
+      empty.textContent = "No resources match those filters. Try another search or choose All categories.";
+      $("#resourceGrid").appendChild(empty);
+    }
+    empty.hidden = false;
+  }else if(empty){ empty.hidden = true; }
+}
+
+async function loadResources(){
   const grid = $("#resourceGrid");
   const curatedResources = [
-    {
-      category:"Immediate support",
-      name:"Washington 211",
-      description:"Find local food, housing, utility assistance, health services, childcare and other community programs. Search online or call 2-1-1.",
-      website:"https://wa211.org/",
-      phone:"Call 2-1-1"
-    },
-    {
-      category:"Crisis support",
-      name:"988 Suicide & Crisis Lifeline",
-      description:"Free, confidential support for people experiencing emotional distress or a mental health crisis, 24/7.",
-      website:"https://988lifeline.org/",
-      phone:"Call or text 988"
-    },
-    {
-      category:"Food & nutrition",
-      name:"Washington WIC",
-      description:"Nutrition education and food benefits for eligible pregnant and postpartum people, infants and children under five.",
-      website:"https://doh.wa.gov/you-and-your-family/wic",
-      phone:""
-    },
-    {
-      category:"Family benefits",
-      name:"Washington DSHS — TANF",
-      description:"Learn about cash assistance and related services for eligible families with children.",
-      website:"https://www.dshs.wa.gov/esa/community-services-offices/temporary-assistance-needy-families",
-      phone:""
-    },
-    {
-      category:"Childcare",
-      name:"Child Care Aware of Washington",
-      description:"Get help finding childcare and information about resources for families and providers.",
-      website:"https://childcareawarewa.org/",
-      phone:""
-    },
-    {
-      category:"Housing",
-      name:"Washington State Housing Resources",
-      description:"Start with the state resource directory for housing assistance, homelessness services and related support.",
-      website:"https://www.commerce.wa.gov/",
-      phone:"For local referrals, call 2-1-1"
-    },
-    {
-      category:"Safety & advocacy",
-      name:"Washington State Coalition Against Domestic Violence",
-      description:"Find information and pathways to local domestic violence advocacy and safety-planning services. If you are in immediate danger, call 911.",
-      website:"https://wscadv.org/",
-      phone:""
-    },
-    {
-      category:"Pregnancy & postpartum",
-      name:"Postpartum Support International",
-      description:"Information and support for pregnancy- and postpartum-related emotional wellbeing, including ways to connect with trained support.",
-      website:"https://postpartum.net/",
-      phone:"Call or text 1-800-944-4773"
-    },
-    {
-      category:"Parenting & family",
-      name:"ParentHelp123",
-      description:"Washington-focused information to help families connect with food, health coverage and other services for children and parents.",
-      website:"https://www.parenthelp123.org/",
-      phone:""
-    }
+    {category:"financial",name:"Washington 211",description:"Find local food, housing, utility assistance, health services, childcare and other community programs. Search online or call 2-1-1.",website:"https://wa211.org/",phone:"Call 2-1-1"},
+    {category:"mental-health",name:"988 Suicide & Crisis Lifeline",description:"Free, confidential support for people experiencing emotional distress or a mental health crisis, 24/7.",website:"https://988lifeline.org/",phone:"Call or text 988"},
+    {category:"food",name:"Washington WIC",description:"Nutrition education and food benefits for eligible pregnant and postpartum people, infants and children under five.",website:"https://doh.wa.gov/you-and-your-family/wic"},
+    {category:"financial",name:"Washington DSHS — TANF",description:"Learn about cash assistance and related services for eligible families with children.",website:"https://www.dshs.wa.gov/esa/community-services-offices/temporary-assistance-needy-families"},
+    {category:"childcare",name:"Child Care Aware of Washington",description:"Get help finding childcare and information about resources for families and providers.",website:"https://childcareawarewa.org/"},
+    {category:"housing",name:"Washington State Department of Commerce",description:"Start with the state agency website to find housing assistance and homelessness-related programs and referrals.",website:"https://www.commerce.wa.gov/",phone:"For local referrals, call 2-1-1"},
+    {category:"safety",name:"Washington State Coalition Against Domestic Violence",description:"Find information and pathways to local domestic violence advocacy and safety-planning services. If you are in immediate danger, call 911.",website:"https://wscadv.org/"},
+    {category:"mental-health",name:"Postpartum Support International",description:"Information and support for pregnancy- and postpartum-related emotional wellbeing, including ways to connect with trained support.",website:"https://postpartum.net/",phone:"Call or text 1-800-944-4773"},
+    {category:"childcare",name:"ParentHelp123",description:"Washington-focused information to help families connect with food, health coverage and other services for children and parents.",website:"https://www.parenthelp123.org/"}
   ];
 
-  function renderResource(resource){
-    const safeWebsite = /^https:\/\//i.test(String(resource.website || "")) ? String(resource.website) : "";
-    return `
-      <article class="resource">
-        <span class="resource-tag">${escapeHTML(resource.category || "Community resource")}</span>
-        <h3>${escapeHTML(resource.name || "Resource")}</h3>
-        <p>${escapeHTML(resource.description || "")}</p>
-        ${safeWebsite ? `<a href="${escapeHTML(safeWebsite)}" target="_blank" rel="noopener noreferrer">Visit resource ↗</a>` : ""}
-        ${resource.phone ? `<p style="margin-top:10px"><strong>${escapeHTML(resource.phone)}</strong></p>` : ""}
-      </article>`;
-  }
+  allResources = curatedResources.map(r=>({...r,source:"curated"}));
+  grid.innerHTML = allResources.map(renderResource).join("");
+  applyResourceFilters();
 
-  // Render useful public resources immediately; the page remains useful even
-  // when the community database is empty or temporarily unreachable.
-  grid.innerHTML = curatedResources.map(renderResource).join("");
-
-  try {
-    const { data, error } = await supabaseClient
-      .from("mother_resources")
-      .select("*")
-      .eq("verified", true)
-      .order("created_at", { ascending: false });
-
-    if(error){
-      console.warn("Community resource loading issue:", error.message);
-      return;
-    }
-
+  try{
+    const {data,error} = await supabaseClient.from("mother_resources").select("*").eq("verified",true).order("created_at",{ascending:false});
+    if(error){ console.warn("Community resource loading issue:",error.message); return; }
     if(data && data.length){
-      const curatedNames = new Set(curatedResources.map(r => r.name.toLowerCase()));
-      const communityResources = data.filter(r =>
-        r.name && !curatedNames.has(String(r.name).toLowerCase())
-      );
-      if(communityResources.length){
-        grid.innerHTML += communityResources.map(renderResource).join("");
-      }
+      const known = new Set(allResources.map(r=>String(r.name).toLowerCase()));
+      const extras = data.filter(r=>r.name && !known.has(String(r.name).toLowerCase()));
+      allResources = allResources.concat(extras);
+      grid.innerHTML = allResources.map(renderResource).join("");
+      applyResourceFilters();
     }
-  } catch(error) {
-    console.warn("Community resources could not be refreshed:", error);
+  }catch(error){
+    console.warn("Community resources could not be refreshed:",error);
   }
 }
+
+$("#resourceSearch").addEventListener("input",applyResourceFilters);
+$("#resourceCategory").addEventListener("change",applyResourceFilters);
+
+$("#openResourceSubmission").addEventListener("click",()=>{
+  $("#resourceSubmissionPanel").classList.remove("hidden");
+  $("#suggestionName").focus();
+});
+$("#cancelResourceSubmission").addEventListener("click",()=>{
+  $("#resourceSubmissionPanel").classList.add("hidden");
+  $("#resourceSuggestionMessage").className="form-message";
+  $("#resourceSuggestionMessage").textContent="";
+});
+
+$("#resourceSubmissionForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  const button=$("#resourceSuggestionSubmit");
+  const message=$("#resourceSuggestionMessage");
+  const website=$("#suggestionWebsite").value.trim();
+  if(website && !/^https:\/\//i.test(website)){
+    setFormMessage(message,"Please enter a secure website address beginning with https://.","error");
+    return;
+  }
+  const payload={
+    organization_name:$("#suggestionName").value.trim(),
+    category:$("#suggestionCategory").value,
+    description:$("#suggestionDescription").value.trim(),
+    website:website || null,
+    phone:$("#suggestionPhone").value.trim() || null,
+    submitter_email:$("#suggestionEmail").value.trim() || null,
+    service_area:$("#suggestionArea").value.trim() || null,
+    review_status:"pending"
+  };
+  setLoading(button,true,"Sending…");
+  try{
+    const {error}=await supabaseClient.from("mother_resource_submissions").insert(payload);
+    if(error) throw error;
+    setFormMessage(message,"Thank you. Your suggestion has been sent for review and will not appear publicly until approved.","success");
+    $("#resourceSubmissionForm").reset();
+    showToast("Resource suggestion submitted for review.");
+  }catch(error){
+    console.error("Resource suggestion submission failed:",error);
+    setFormMessage(message,"We couldn't submit this suggestion. The submission table and public INSERT permission may need to be configured by the site administrator. Please contact the community team instead.","error");
+  }finally{
+    setLoading(button,false);
+  }
+});
 
 
 /* =========================================================
