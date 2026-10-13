@@ -2527,6 +2527,15 @@ const supabaseClient =
     SUPABASE_PUBLISHABLE_KEY
   );
 
+/* Dedicated connection for PNWM registration and application submissions.
+   Keep the existing PNWM content connection above unchanged. */
+const REQUESTS_SUPABASE_URL = "https://cevylpnoexugwgygvtgu.supabase.co";
+const REQUESTS_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_AdfM5y6RqvF3tbvEVzDZSg_JuGTQLD-";
+const requestsSupabaseClient = window.supabase.createClient(
+  REQUESTS_SUPABASE_URL,
+  REQUESTS_SUPABASE_PUBLISHABLE_KEY
+);
+
 
 /* =========================================================
    HELPERS
@@ -2831,7 +2840,7 @@ $("#communityApplicationForm").addEventListener("submit",async event=>{
   const table=kind==="event"?"mother_event_registration_requests":"mother_program_application_requests",button=$("#applicationSubmit");
   button.disabled=true;button.textContent="Sending…";setApplicationMessage("");
   try{
-    const {error}=await supabaseClient.from(table).insert(payload);if(error)throw error;
+    const {error}=await requestsSupabaseClient.from(table).insert(payload);if(error)throw error;
     setApplicationMessage("Thank you. Your request has been received for review. The PNWM team can follow up using your contact details.","success");showToast("Your request has been submitted.");
     form.reset();$("#applicationKind").value=kind;$("#applicationItemId").value=payload.item_id||"";$("#applicationItemTitle").value=title;
   }catch(error){
