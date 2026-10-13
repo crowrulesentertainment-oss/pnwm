@@ -1761,7 +1761,7 @@ footer a:hover{
       <h2>Community happens together.</h2>
 
       <p>
-        Events are managed through Supabase. When no events are published yet, proposed gatherings appear here so the community can help shape them. Dates and venues are not confirmed until announced.
+        Events are managed through Supabase. If none are published there, this page displays selected real events from regional organizers with links to official event pages. Verify details and registration with the organizer before attending.
       </p>
 
     </div>
@@ -2942,42 +2942,13 @@ async function loadEvents(){
 
 function getStarterEvents(){
   return [
-    {
-      id:"pnwm-interest-listening-circle",
-      title:"Mothers’ Community Listening Circle",
-      description:"A welcoming, low-pressure conversation for mothers and caregivers to share what support, connections and local resources would be most useful. Help shape the future of PNWM.",
-      event_date:null,
-      location:"Pacific Northwest · format to be determined",
-      event_type:"Community connection",
-      status:"planning"
-    },
-    {
-      id:"pnwm-virtual-welcome",
-      title:"PNWM Welcome & Resource Exchange",
-      description:"An introductory gathering to meet the community, exchange resource ideas and identify trusted local organizations. We’re collecting interest before confirming a date and format.",
-      event_date:null,
-      location:"Online or regional meetup · details to be determined",
-      event_type:"Welcome / networking",
-      status:"planning"
-    },
-    {
-      id:"pnwm-family-resource-workshop",
-      title:"Family Resource Navigation Workshop",
-      description:"A proposed practical session about finding family, childcare, food, housing and wellbeing resources across the Pacific Northwest. Share the topics you would like covered.",
-      event_date:null,
-      location:"Pacific Northwest · venue and format to be determined",
-      event_type:"Resource education",
-      status:"planning"
-    },
-    {
-      id:"pnwm-community-partner-roundtable",
-      title:"Community Partner & Volunteer Roundtable",
-      description:"A proposed conversation for community groups, service providers and volunteers interested in collaborating on useful, family-centered support.",
-      event_date:null,
-      location:"Pacific Northwest · details to be determined",
-      event_type:"Partnership / volunteer",
-      status:"planning"
-    }
+    {id:"real-peps-advocacy-camp-2026",title:"PEPS & Children’s Alliance Advocacy Camp",description:"Free one-day training focused on learning, connection and advocacy for children and families in Washington. Confirm registration and details with PEPS before attending.",event_date:"2026-10-24T08:30:00",location:"SURF Incubator, Waimea Room, 999 3rd Ave, Suite 700, Seattle, WA",event_type:"Family advocacy training",status:"published",registration_url:"https://peps.org/get-involved/events",website_url:"https://peps.org/"},
+    {id:"real-amara-caregivers-tacoma-oct-2026",title:"Amara Caregivers Support Group — Tacoma",description:"Free monthly support group for foster and kinship caregivers to connect and learn in a facilitated, supportive setting. Confirm current venue details with Amara before traveling.",event_date:"2026-10-27T17:30:00",location:"Gates High School, Tacoma, WA (confirm room/location with Amara)",event_type:"Caregiver support group",status:"published",registration_url:"https://amarafamily.org/get-involved/events-trainings/",website_url:"https://amarafamily.org/"},
+    {id:"real-amara-caregivers-seattle-oct-2026",title:"Amara Caregivers Support Group — Seattle",description:"Free monthly gathering for foster and kinship caregivers, with facilitated conversation and a light dinner. Confirm current venue details with Amara before attending.",event_date:"2026-10-29T17:30:00",location:"Amara Seattle office (confirm current details with organizer)",event_type:"Caregiver support group",status:"published",registration_url:"https://amarafamily.org/get-involved/events-trainings/",website_url:"https://amarafamily.org/"},
+    {id:"real-peps-wellness-weekend-2026",title:"YMCA Women’s Wellness Weekend with PEPS",description:"Multi-day women’s wellness weekend at Camp Seymour. PEPS lists a $239 cost with its discount code; verify availability, pricing and registration with the organizer.",event_date:"2026-11-06T08:00:00",location:"Camp Seymour, Gig Harbor, WA",event_type:"Women’s wellness retreat",status:"published",registration_url:"https://peps.org/get-involved/events",website_url:"https://peps.org/"},
+    {id:"real-peps-visible-tacoma-nov-2026",title:"PEPS x VISIBLE Parent Networking — Tacoma",description:"Free networking meetup for parents of infants and toddlers to build connections and share experiences. Confirm registration and details with PEPS.",event_date:"2026-11-15T10:30:00",location:"Green Trike Children’s Museum, 1501 Pacific Ave, Tacoma, WA",event_type:"Parent networking",status:"published",registration_url:"https://peps.org/get-involved/events",website_url:"https://peps.org/"},
+    {id:"real-peps-leader-info-nov-2026",title:"PEPS Group Leader Information Session",description:"Free virtual information session for people interested in helping lead PEPS parent groups. Confirm the session time and registration status on PEPS’ event page.",event_date:"2026-11-19T12:00:00",location:"Online",event_type:"Volunteer / facilitator information",status:"published",registration_url:"https://peps.org/get-involved/events",website_url:"https://peps.org/"},
+    {id:"real-amara-parents-united-dec-2026",title:"Amara Parents United Community Event",description:"Amara lists Parents United as a free community-building program for parents who have experienced child welfare, with family activities and food. Confirm eligibility and registration with Amara.",event_date:"2026-12-12T16:00:00",location:"Program location — confirm with Amara",event_type:"Family community gathering",status:"published",registration_url:"https://amarafamily.org/get-involved/events-trainings/",website_url:"https://amarafamily.org/"}
   ];
 }
 
@@ -3057,54 +3028,13 @@ async function loadPrograms(){
 
 function getStarterPrograms(){
   return [
-    {
-      id:"pnwm-peer-connection",
-      name:"Peer Connection & Community Circles",
-      category:"community",
-      description:"A proposed peer-connection program where mothers and caregivers can share experiences, build social connections and help guide future community gatherings. Currently collecting interest; sessions are not yet scheduled.",
-      service_area:"Pacific Northwest",
-      status:"Proposed — gathering interest"
-    },
-    {
-      id:"pnwm-family-resource-navigation",
-      name:"Family Resource Navigation",
-      category:"practical",
-      description:"Help shape a practical directory and referral pathway for family needs such as food, housing, childcare, financial assistance and local support services. PNWM does not guarantee eligibility or provide these services directly.",
-      service_area:"Pacific Northwest",
-      status:"Proposed — gathering interest"
-    },
-    {
-      id:"pnwm-maternal-wellbeing",
-      name:"Maternal Wellbeing & Support",
-      category:"wellbeing",
-      description:"A proposed community-led space to identify helpful wellbeing resources and peer support options for mothers. This is not a clinical or crisis service, and no sessions have been scheduled.",
-      service_area:"Pacific Northwest",
-      status:"Proposed — gathering interest"
-    },
-    {
-      id:"pnwm-parent-learning",
-      name:"Parent Learning & Resource Workshops",
-      category:"education",
-      description:"Suggest topics for future workshops and resource-sharing sessions, from navigating community services to practical parenting information. Content and facilitators will be confirmed after community input.",
-      service_area:"Online and regional options under consideration",
-      status:"Proposed — gathering interest"
-    },
-    {
-      id:"pnwm-community-volunteer-network",
-      name:"Community Volunteer & Partner Network",
-      category:"community",
-      description:"Connect with PNWM about volunteering, sharing verified resources or exploring collaboration with an organization that supports mothers and families.",
-      service_area:"Pacific Northwest",
-      status:"Open to expressions of interest"
-    },
-    {
-      id:"pnwm-family-practical-support",
-      name:"Family Practical Support Ideas",
-      category:"family",
-      description:"Help prioritize future community initiatives around everyday family needs. This is a planning and feedback opportunity, not a promise of direct financial aid, childcare or other services.",
-      service_area:"Pacific Northwest",
-      status:"Proposed — gathering interest"
-    }
+    {id:"real-peps-parent-groups",name:"PEPS Parent Groups & Community",category:"community",description:"PEPS connects parents of newborns and young children through facilitated parent groups, peer connection and community events. Group availability and eligibility vary; visit the official site to find a group.",service_area:"Seattle area and other Washington communities, depending on group",status:"Active organization — check current group availability",website_url:"https://peps.org/programs",signup_url:"https://peps.org/get-involved/events"},
+    {id:"real-withinreach-parenthelp123",name:"ParentHelp123 / WithinReach",category:"practical",description:"Washington families can use ParentHelp123 to explore potential eligibility for programs such as health coverage and food assistance and find family-health resources. Eligibility and benefits are determined by the relevant agencies.",service_area:"Washington State",status:"Resource and referral service",website_url:"https://www.parenthelp123.org/",signup_url:"https://www.parenthelp123.org/"},
+    {id:"real-wa-pprs-resource-finder",name:"Pregnant & Parenting Recovery Services Resource Finder",category:"practical",description:"A Washington resource finder for pregnant and parenting people, covering topics such as housing, benefits, perinatal care, parenting, transportation, infant needs and recovery services.",service_area:"Washington State",status:"Online resource directory",website_url:"https://pprs.doh.wa.gov/",signup_url:"https://pprs.doh.wa.gov/"},
+    {id:"real-amara-parents-united",name:"Amara — Parents United",category:"community",description:"Amara describes Parents United as a community-building program for parents who have experienced child welfare, with opportunities to connect with peers and attend family-friendly gatherings. Contact Amara to confirm current availability and participation requirements.",service_area:"Seattle and Tacoma / Pierce County; confirm current details",status:"Contact provider for current offerings",website_url:"https://amarafamily.org/get-involved/events-trainings/",signup_url:"https://amarafamily.org/"},
+    {id:"real-multicultural-child-family-hope-center",name:"Multicultural Child & Family Hope Center",category:"family",description:"Tacoma-based family service organization offering early learning and family-support services. Programs, eligibility, availability and enrollment details should be confirmed directly with the center.",service_area:"Tacoma and Pierce County",status:"Contact provider for current programs",website_url:"https://www.mcfhc.org/",signup_url:"https://www.mcfhc.org/"},
+    {id:"real-wa-parent-to-parent",name:"Washington State Parent to Parent",category:"wellbeing",description:"A family-to-family support network for families of children and youth with special health care needs. Ask the organization about local connections, support and current options.",service_area:"Washington State",status:"Family support network",website_url:"https://wapave.org/parent-to-parent/",signup_url:"https://wapave.org/parent-to-parent/"},
+    {id:"real-withinreach-family-health",name:"WithinReach Family Health Resource Line",category:"wellbeing",description:"WithinReach helps families navigate maternal and child health resources and referrals. The Washington State Department of Health lists its family resource line at 1-800-322-2588; confirm current service details directly.",service_area:"Washington State",status:"Resource and referral service",website_url:"https://doh.wa.gov/you-and-your-family/infants-and-children/health-and-safety/parents-and-families-services-and-resources",signup_url:"https://doh.wa.gov/you-and-your-family/infants-and-children/health-and-safety/parents-and-families-services-and-resources"}
   ];
 }
 
